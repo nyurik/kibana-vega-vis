@@ -1,0 +1,25 @@
+{
+  "name": "vega_vis",
+  "version": "0.0.0",
+  "description": "Build vega visualizations into Kibana",
+  "main": "index.js",
+  "kibana": {
+    "version": "kibana"
+  },
+  "scripts": {
+    "lint": "eslint",
+    "start": "plugin-helpers start",
+    "test:server": "plugin-helpers test:server",
+    "test:browser": "plugin-helpers test:browser",
+    "build": "plugin-helpers build",
+    "postinstall": "plugin-helpers postinstall"
+  },
+  "devDependencies": {
+    "@elastic/eslint-config-kibana": "0.0.2",
+    "@elastic/plugin-helpers": "^6.0.0",
+    "babel-eslint": "4.1.8",
+    "chai": "^3.5.0",
+    "eslint": "1.10.3",
+    "eslint-plugin-mocha": "1.1.0"
+  }
+}
