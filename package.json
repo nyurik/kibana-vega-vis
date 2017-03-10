@@ -21,5 +21,8 @@
     "chai": "^3.5.0",
     "eslint": "1.10.3",
     "eslint-plugin-mocha": "1.1.0"
+  },
+  "dependencies": {
+    "vega": "^3.0.0-beta.25"
   }
 }
