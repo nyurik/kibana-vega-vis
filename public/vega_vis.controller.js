@@ -1,5 +1,5 @@
 import { ResizeCheckerProvider } from 'ui/resize_checker';
-import TabifyProvider from 'ui/agg_response/tabify/tabify';
+import { AggResponseTabifyProvider } from 'ui/agg_response/tabify/tabify';
 
 import demoSpecJSON from './demo.spec.json';
 import { createVegaView } from './vega_view';
@@ -7,7 +7,7 @@ import moment from 'moment';
 
 export function createVegaVisController(Private, $scope) {
   const ResizeChecker = Private(ResizeCheckerProvider);
-  const tabify = Private(TabifyProvider);
+  const tabify = Private(AggResponseTabifyProvider);
 
   class VegaVisController {
     link($scope, $el, $attr) {

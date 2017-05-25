@@ -1,5 +1,5 @@
-import TemplateVisTypeProvider from 'ui/template_vis_type/template_vis_type';
-import VisSchemasProvider from 'ui/vis/schemas';
+import { TemplateVisTypeProvider } from 'ui/template_vis_type/template_vis_type';
+import { VisSchemasProvider } from 'ui/vis/schemas';
 import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
 
 import './vega_vis.directive';
