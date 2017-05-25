@@ -1,4 +1,4 @@
-import uiModules from 'ui/modules';
+import { uiModules } from 'ui/modules';
 
 import { createVegaVisController } from './vega_vis.controller.js';
 import VegaVisTemplate from './vega_vis.template.html';

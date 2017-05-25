@@ -23,6 +23,6 @@
     "eslint-plugin-mocha": "1.1.0"
   },
   "dependencies": {
-    "vega": "^3.0.0-beta.25"
+    "vega": "^3.0.0-beta.32"
   }
 }
