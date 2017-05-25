@@ -1,0 +1,144 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+  "data": [
+    {
+      "name": "esResp",
+      "values": [
+      ]
+    }
+  ],
+  "signals": [
+    {
+      "name": "tooltip",
+      "value": {},
+      "on": [
+        {
+          "events": "rect:mouseover",
+          "update": "datum"
+        },
+        {
+          "events": "rect:mouseout",
+          "update": "{}"
+        }
+      ]
+    }
+  ],
+  "scales": [
+    {
+      "name": "xWidthScale",
+      "type": "ordinal",
+      "domain": {
+        "data": "esResp",
+        "field": "buckets1"
+      },
+      "range": "width"
+    },
+    {
+      "name": "xscale",
+      "type": "time",
+      "domain": {
+        "data": "esResp",
+        "field": "buckets1"
+      },
+      "range": "width"
+    },
+    {
+      "name": "yscale",
+      "domain": {
+        "data": "esResp",
+        "field": "metrics1"
+      },
+      "nice": true,
+      "range": "height"
+    }
+  ],
+  "axes": [
+    {
+      "orient": "bottom",
+      "scale": "xscale",
+      "format": "%c",
+      "labelPadding": 20,
+      "tickCount": 5
+    },
+    {
+      "orient": "left",
+      "scale": "yscale"
+    }
+  ],
+  "marks": [
+    {
+      "type": "rect",
+      "from": {
+        "data": "esResp"
+      },
+      "encode": {
+        "update": {
+          "fill": {
+            "value": "gray"
+          },
+          "x": {
+            "scale": "xscale",
+            "field": "buckets1",
+            "offset": 1
+          },
+          "width": {
+            "scale": "xWidthScale",
+            "band": 1,
+            "offset": -1
+          },
+          "y": {
+            "scale": "yscale",
+            "field": "metrics1"
+          },
+          "y2": {
+            "scale": "yscale",
+            "value": 0
+          }
+        },
+        "hover": {
+          "fill": {
+            "value": "steelblue"
+          }
+        }
+      }
+    },
+    {
+      "type": "text",
+      "encode": {
+        "update": {
+          "align": {
+            "value": "center"
+          },
+          "baseline": {
+            "value": "bottom"
+          },
+          "fill": {
+            "value": "#333"
+          },
+          "x": {
+            "scale": "xscale",
+            "signal": "tooltip.buckets1",
+            "band": 0.5
+          },
+          "y": {
+            "scale": "yscale",
+            "signal": "tooltip.metrics1",
+            "offset": -2
+          },
+          "text": {
+            "signal": "tooltip.metrics1"
+          },
+          "fillOpacity": [
+            {
+              "test": "datum === tooltip",
+              "value": 0
+            },
+            {
+              "value": 1
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

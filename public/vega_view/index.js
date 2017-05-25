@@ -1,0 +1,1 @@
+export { createVegaView } from './vega_view';

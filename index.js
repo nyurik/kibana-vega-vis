@@ -3,7 +3,7 @@ export default kibana => new kibana.Plugin({
 
   uiExports: {
     visTypes: [
-      'plugins/vega_vis/vega_vis.js'
+      'plugins/vega_vis/vega_vis.vis_type.js'
     ]
   }
 });

@@ -1,39 +1,75 @@
-import * as vega from 'vega';
-
 import { ResizeCheckerProvider } from 'ui/resize_checker';
+import TabifyProvider from 'ui/agg_response/tabify/tabify';
 
-import voyagerSpec from './voyager.vg.json';
+import demoSpecJSON from './demo.spec.json';
+import { createVegaView } from './vega_view';
+import moment from 'moment';
 
-export class VegaVisController {
-  constructor(Private) {
-    this.ResizeChecker = Private(ResizeCheckerProvider);
+export function createVegaVisController(Private, $scope) {
+  const ResizeChecker = Private(ResizeCheckerProvider);
+  const tabify = Private(TabifyProvider);
+
+  class VegaVisController {
+    link($scope, $el, $attr) {
+      const resizeChecker = new ResizeChecker($el);
+      this.vegaView = createVegaView($el.get(0), demoSpecJSON);
+
+      resizeChecker.on('resize', () => {
+        resizeChecker.modifySizeWithoutTriggeringResize(() => {
+          this.vegaView.resize();
+        });
+      });
+
+      $scope.$on('$destroy', () => {
+        this.vegaView.destroy();
+      });
+
+      resizeChecker.modifySizeWithoutTriggeringResize(() => {
+        this.vegaView.resize();
+      });
+    }
+
+    onEsResponse(vis, esResponse) {
+      if (!this.vegaView) {
+        throw new Error('esResponse provided before vegaView was initialized');
+      }
+
+      if (!vis || !esResponse) {
+        this.vegaView.setData([]);
+        return;
+      }
+
+      const { columns, rows } = tabify(vis, esResponse, {
+        canSplit: false,
+        partialRows: true,
+        minimalColumns: false,
+        // metricsForAllBuckets: false,
+        asAggConfigResults: false,
+      });
+
+      const aggTypeCounters = {};
+      const columnNames = columns.map(col => {
+        const typeName = col.aggConfig.type.type;
+        const count = (aggTypeCounters[typeName] || 0) + 1;
+        aggTypeCounters[typeName] = count;
+        return `${typeName}${count}`;
+      });
+
+      const vegaTable = rows.map(row => {
+        return columns.reduce((acc, column, i) => {
+          let value = row[i];
+          const field = column.aggConfig.getField();
+          if (field && field.type === 'date') {
+            value = moment(value);
+          }
+          acc[columnNames[i]] = value;
+          return acc;
+        }, {});
+      });
+
+      this.vegaView.setData(vegaTable);
+    }
   }
 
-  link($scope, $el, $attr) {
-    this.resizeChecker = new this.ResizeChecker($el);
-
-    const view = new vega.View(vega.parse(voyagerSpec))
-      .logLevel(vega.Warn)    // set view logging level
-      .renderer('svg')        // set renderer (canvas or svg)
-      .initialize($el.get(0)) // initialize view within parent DOM container
-      .hover()                // enable hover encode set processing
-      .width($el.width() - 100)
-      .height($el.height() - 100)
-      .padding({ left: 0, right: 0, top: 0, bottom: 0 });
-
-    this.resizeChecker.modifySizeWithoutTriggeringResize(() => {
-      view.run();                 // run the dataflow and render the view
-    });
-
-    this.resizeChecker.on('resize', () => {
-      view
-        .width($el.width() - 100)
-        .height($el.height() - 100)
-        .run();
-    });
-
-    $scope.$on('$destroy', () => {
-      view.finalize();
-    });
-  }
+  return new VegaVisController();
 }
