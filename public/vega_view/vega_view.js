@@ -1,13 +1,13 @@
 import $ from 'jquery';
 import * as Vega from 'vega';
 
-export function createVegaView(el, specJSON) {
+export function createVegaView(el, spec) {
   const $el = $(el);
 
   const getWidth = () => $el.width() - 100;
   const getHeight = () => $el.height() - 100;
 
-  const view = new Vega.View(Vega.parse(specJSON))
+  const view = new Vega.View(Vega.parse(spec))
     .logLevel(Vega.Warn)
     .renderer('canvas')
     .padding({ left: 0, right: 0, top: 0, bottom: 0 })
