@@ -23,6 +23,6 @@
     "eslint-plugin-mocha": "1.1.0"
   },
   "dependencies": {
-    "vega": "^3.0.0-beta.32"
+    "vega-embed": "git+https://github.com/nyurik/vega-embed.git#8c4e7608f449204eefdfa99cb572e4a4c2d1a2ef"
   }
 }
