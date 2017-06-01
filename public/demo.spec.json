@@ -9,44 +9,32 @@
     {
       "name": "table",
       "url": {
-        "_header": {
-          "index": "logstash-*"
-        },
-        "query": {
-          "bool": {
-            "must": [
-              {
-                "query_string": {
-                  "query": "*",
-                  "analyze_wildcard": true
-                }
-              },
-              {
-                "range": {
-                  "@timestamp": {
-                    "gte": 1493656731213,
-                    "lte": 1496248731213,
-                    "format": "epoch_millis"
-                  }
-                }
+        "index": "logstash-*",
+        "body": {
+          "query": {
+            "range": {
+              "@timestamp": {
+                "gte": 1493656731213,
+                "lte": 1496248731213,
+                "format": "epoch_millis"
               }
-            ]
-          }
-        },
-        "aggs": {
-          "hist": {
-            "date_histogram": {
-              "field": "@timestamp",
-              "interval": "2h",
-              "time_zone": "America/New_York",
-              "min_doc_count": 1
             }
-          }
-        },
-        "docvalue_fields": [
-          "utc_time",
-          "@timestamp"
-        ]
+          },
+          "aggs": {
+            "hist": {
+              "date_histogram": {
+                "field": "@timestamp",
+                "interval": "2h",
+                "time_zone": "America/New_York",
+                "min_doc_count": 1
+              }
+            }
+          },
+          "docvalue_fields": [
+            "utc_time",
+            "@timestamp"
+          ]
+        }
       },
       "format": {
         "type": "json",
