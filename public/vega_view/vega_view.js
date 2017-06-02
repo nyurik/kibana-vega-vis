@@ -3,7 +3,7 @@ import $ from 'jquery';
 // Strangely, importing from vega-embed directly doesn't compile
 import embed from 'vega-embed/src/embed';
 
-export function createVegaView(el, spec) {
+export function createVegaView($scope, el, spec, timefilter, es) {
   const $el = $(el);
 
   const getWidth = () => $el.width() - 100;
@@ -22,33 +22,10 @@ export function createVegaView(el, spec) {
        */
       loader: {
         load: (uri, opts) => {
-          return new Promise((accept, reject) => {
-            switch (opts.context) {
-              case 'dataflow':
-                // FIXME!!! - should use standard Kibana requester
-                let body = uri.body;
-                if (body === undefined) {
-                  throw new Error('Missing request body');
-                }
-                delete uri.body;
-                $.ajax({
-                  type: 'POST',
-                  url: 'https://localhost:5601/uvx/elasticsearch/_msearch',
-                  dataType: 'json',
-                  data: JSON.stringify(uri) + '\n' + JSON.stringify(body) + '\n',
-                  headers: {
-                    'kbn-name': 'kibana',
-                    'kbn-version': '6.0.0-alpha2',
-                    'content-type': 'application/x-ndjson',
-                    'accept': 'application/json, text/plain, */*'
-                  },
-                  success: (result) => {
-                    accept(result);
-                  }
-                });
-                break;
-            }
-          });
+          switch (opts.context) {
+            case 'dataflow':
+              return queryEsData(uri);
+          }
         },
         sanitize: (uri, opts) => {
           return Promise.resolve({});
@@ -57,7 +34,8 @@ export function createVegaView(el, spec) {
     },
     "width": getWidth(),
     "height": getHeight(),
-    "padding": {left: 0, right: 0, top: 0, bottom: 0}
+    "padding": {left: 0, right: 0, top: 0, bottom: 0},
+    "actions": false
   };
 
   let viewP = new Promise((accept, reject) => {
@@ -71,26 +49,59 @@ export function createVegaView(el, spec) {
 
   class VegaView {
     resize() {
-      viewP.then(v =>
-        v.view
-          .width(getWidth())
-          .height(getHeight())
-          .run());
+      // viewP.then(v =>
+      //   v.view
+      //     .width(getWidth())
+      //     .height(getHeight())
+      //     .run());
     }
 
-    // setData(data) {
-    //   const changeset = Vega.changeset()
-    //     .remove(view.data('esResp'))
-    //     .insert(data);
-    //
-    //   view
-    //     .change('esResp', changeset)
-    //     .run();
-    // }
-    //
     destroy() {
       viewP.then(v=> v.view.finalize());
       $el.empty();
+    }
+  }
+
+  function queryEsData(uri) {
+
+    updateTimeRecursive(uri);
+
+    return es.search(uri).then(resp => {
+      if (resp.hits) {
+        if (resp.hits.total < 1) {
+          $scope.status = 'notFound';
+        } else {
+          $scope.status = 'found';
+          $scope.hit = resp.hits.hits[0];
+        }
+      }
+      // return JSON.stringify(resp);
+      return resp;
+    }).catch(err => {
+      if (err.status === 404) {
+        $scope.status = 'notFound';
+      } else {
+        $scope.status = 'error';
+        $scope.resp = err;
+      }
+    });
+  }
+
+  function updateTimeRecursive(obj) {
+    if (obj && typeof obj === 'object') {
+      if (obj['%timefilter%']) {
+        delete obj['%timefilter%'];
+        const bounds = timefilter.getBounds();
+        obj.gte = bounds.min.valueOf();
+        obj.lte = bounds.max.valueOf();
+        obj.format = 'epoch_millis';
+      } else {
+        for (const prop in obj) {
+          if (obj.hasOwnProperty(prop)) {
+            updateTimeRecursive(obj[prop]);
+          }
+        }
+      }
     }
   }
 
