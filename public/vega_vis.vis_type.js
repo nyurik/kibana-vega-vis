@@ -26,11 +26,10 @@ VisTypesRegistryProvider.register(function MetricVisProvider(Private) {
       defaults: {
         spec: demoSpec
       },
-      editor: `
-<vega-vis-editor
-  vis="vis"
-  persist-app-state="state.save(true)"
-  ui-state="uiState"
+      editor: `<vega-vis-editor
+vis="vis"
+persist-app-state="state.save(true)"
+ui-state="uiState"
 ></vega-vis-editor>`
     },
     // implementsRenderComplete: true,
