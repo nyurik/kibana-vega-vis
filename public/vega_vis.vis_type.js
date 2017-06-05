@@ -1,5 +1,5 @@
 import { TemplateVisTypeProvider } from 'ui/template_vis_type/template_vis_type';
-import { VisSchemasProvider } from 'ui/vis/schemas';
+// import { VisSchemasProvider } from 'ui/vis/schemas';
 import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
 import { VisVisTypeProvider } from 'ui/vis/vis_type';
 
@@ -12,7 +12,7 @@ import demoSpec from '!!raw-loader!./demo.spec.json';
 VisTypesRegistryProvider.register(function MetricVisProvider(Private) {
   const VisType = Private(VisVisTypeProvider);
   const TemplateVisType = Private(TemplateVisTypeProvider);
-  const VisSchemas = Private(VisSchemasProvider);
+  // const VisSchemas = Private(VisSchemasProvider);
 
   // return the visType object, which kibana will use to display and configure new
   // Vis object of this type.

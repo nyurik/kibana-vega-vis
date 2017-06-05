@@ -1,5 +1,23 @@
-<div
-  ui-ace="{
+<div class="vegaEditor">
+  <div class="vegaEditorToolbar">
+    <span>Reformat as:</span>
+    <button
+      ng-click="vegaEditor.formatHJson()"
+      tooltip="Format with HJSON rules"
+      class="kuiButton kuiButton--basic"
+    >
+      <span>HJSON</span>
+    </button>
+    <button
+      ng-click="vegaEditor.formatJson()"
+      tooltip="Format with JSON rules"
+      class="kuiButton kuiButton--basic"
+    >
+      <span>JSON</span>
+    </button>
+  </div>
+  <div
+    ui-ace="{
     useWrapMode: true,
     advanced: {
       highlightActiveLine: false
@@ -9,14 +27,15 @@
     },
     mode: 'json'
   }"
-  class="vegaEditorSpec"
-  ng-model="vegaEditor.vis.params.spec"
-></div>
+    class="vegaEditorSpec"
+    ng-model="vegaEditor.vis.params.spec"
+  ></div>
+</div>
 <div class="vegaEditorPreview">
-<visualize
-        vis="vegaEditor.vis"
-        ui-state="vegaEditor.uiState"
-        show-spy-panel="vegaEditor.shouldShowSpyPanel()"
->
-</visualize>
+  <visualize
+    vis="vegaEditor.vis"
+    ui-state="vegaEditor.uiState"
+    show-spy-panel="vegaEditor.shouldShowSpyPanel()"
+  >
+  </visualize>
 </div>
