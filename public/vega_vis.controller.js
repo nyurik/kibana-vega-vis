@@ -1,21 +1,23 @@
 import { ResizeCheckerProvider } from 'ui/resize_checker';
-import { AggResponseTabifyProvider } from 'ui/agg_response/tabify/tabify';
+//import { AggResponseTabifyProvider } from 'ui/agg_response/tabify/tabify';
 
 import { createVegaView } from './vega_view';
 // import moment from 'moment';
 
-export function createVegaVisController(Private, $scope, timefilter, es) {
+import hjson from 'hjson';
+
+export function createVegaVisController(Private, /*$scope,*/ timefilter, es) {
   const ResizeChecker = Private(ResizeCheckerProvider);
-  const tabify = Private(AggResponseTabifyProvider);
+  // const tabify = Private(AggResponseTabifyProvider);
 
   class VegaVisController {
-    link($scope, $el, $attr) {
+    link($scope, $el/*, $attr*/) {
       const resizeChecker = new ResizeChecker($el);
 
       // FIXME? is this the right way to monitor timefilter?
       $scope.timefilter = timefilter;
       $scope.$watchMulti(['=vega.vis.params', '=timefilter'], () => {
-        const spec = JSON.parse($scope.vega.vis.params.spec);
+        const spec = hjson.parse($scope.vega.vis.params.spec);
         this.vegaView = createVegaView($scope, $el.get(0), spec, timefilter, es);
 
         resizeChecker.modifySizeWithoutTriggeringResize(() => {

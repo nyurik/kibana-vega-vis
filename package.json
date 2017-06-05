@@ -6,6 +6,12 @@
   "kibana": {
     "version": "kibana"
   },
+  "repository": "spalger/kibana-vega-vis",
+  "license": "Apache-2.0",
+  "author": "Spencer Alger <spencer.alger@elastic.co>",
+  "contributors": [
+    "Yuri Astrakhan <YuriAstrakhan@gmail.com>"
+  ],
   "scripts": {
     "lint": "eslint",
     "start": "plugin-helpers start",
@@ -23,6 +29,8 @@
     "eslint-plugin-mocha": "1.1.0"
   },
   "dependencies": {
+    "hjson": "^2.4.2",
+    "json-stringify-pretty-compact": "^1.0.4",
     "vega-embed": "git+https://github.com/nyurik/vega-embed.git#96647fbea3077508c6160d4bcf288cafff91cf28"
   }
 }

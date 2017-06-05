@@ -2,8 +2,23 @@ vega-vis-editor {
   flex: 1 1 auto;
   flex-direction: row;
   display: flex;
-  .vegaEditorSpec {
+  .vegaEditor {
     flex: 0 0 40%;
+    flex-direction: column;
+    display: flex;
+    // REVIEW!
+    .vegaEditorToolbar {
+      flex: 0 0 1px;
+      // FIXME!
+      background-color: #adadad;
+      padding: 0.3em 1em;
+      button {
+        margin-left: 0.4em;
+      }
+    }
+    .vegaEditorSpec {
+      flex: 1 1 1px;
+    }
   }
   .vegaEditorPreview {
     flex: 1 1 1px;

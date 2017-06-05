@@ -32,18 +32,19 @@ export function createVegaView($scope, el, spec, timefilter, es) {
         }
       }
     },
-    "width": getWidth(),
-    "height": getHeight(),
-    "padding": {left: 0, right: 0, top: 0, bottom: 0},
-    "actions": false
+    width: getWidth(),
+    height: getHeight(),
+    padding: { left: 0, right: 0, top: 0, bottom: 0 },
+    actions: false
   };
 
-  let viewP = new Promise((accept, reject) => {
+  const viewP = new Promise((accept, reject) => {
     embed($el.get(0), spec, opts, (err, v) => {
-      if (err)
+      if (err) {
         reject(err);
-      else
+      } else {
         accept(v);
+      }
     });
   });
 
@@ -67,6 +68,7 @@ export function createVegaView($scope, el, spec, timefilter, es) {
     updateTimeRecursive(uri);
 
     return es.search(uri).then(resp => {
+      // FIXME - report warnings?
       if (resp.hits) {
         if (resp.hits.total < 1) {
           $scope.status = 'notFound';
@@ -78,6 +80,7 @@ export function createVegaView($scope, el, spec, timefilter, es) {
       // return JSON.stringify(resp);
       return resp;
     }).catch(err => {
+      // FIXME - report errors
       if (err.status === 404) {
         $scope.status = 'notFound';
       } else {
