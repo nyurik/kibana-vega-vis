@@ -14,11 +14,18 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es) {
     link($scope, $el/*, $attr*/) {
       const resizeChecker = new ResizeChecker($el);
 
+      const onError = err => $el.text(err.message || err);
+
       // FIXME? is this the right way to monitor timefilter?
       $scope.timefilter = timefilter;
       $scope.$watchMulti(['=vega.vis.params', '=timefilter'], () => {
-        const spec = hjson.parse($scope.vega.vis.params.spec);
-        this.vegaView = createVegaView($scope, $el.get(0), spec, timefilter, es);
+        try {
+          const spec = hjson.parse($scope.vega.vis.params.spec);
+          this.vegaView = createVegaView($scope, $el.get(0), spec, timefilter, es);
+          this.vegaView.promise().catch(onError);
+        } catch (err) {
+          onError(err);
+        }
 
         resizeChecker.modifySizeWithoutTriggeringResize(() => {
           this.vegaView.resize();
