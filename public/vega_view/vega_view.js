@@ -49,6 +49,10 @@ export function createVegaView($scope, el, spec, timefilter, es) {
   });
 
   class VegaView {
+    promise() {
+      return viewP;
+    }
+
     resize() {
       // viewP.then(v =>
       //   v.view
