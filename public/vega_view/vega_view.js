@@ -9,6 +9,20 @@ export function createVegaView($scope, el, spec, timefilter, es) {
   const getWidth = () => $el.width() - 100;
   const getHeight = () => $el.height() - 100;
 
+  const loader = embed.vega.loader();
+  const defaultLoad = loader.load.bind(loader);
+
+  loader.load = (uri, opts) => {
+    if (typeof uri === 'object') {
+      switch (opts.context) {
+        case 'dataflow':
+          return queryEsData(uri);
+      }
+      throw new Error('Unexpected uri object');
+    }
+    return defaultLoad(uri, opts);
+  };
+
   const opts = {
     viewConfig: {
       /**
@@ -20,33 +34,22 @@ export function createVegaView($scope, el, spec, timefilter, es) {
        * sanitized URI data with the sanitized url assigned to the "href" property
        * (sanitize).
        */
-      loader: {
-        load: (uri, opts) => {
-          switch (opts.context) {
-            case 'dataflow':
-              return queryEsData(uri);
-          }
-        },
-        sanitize: (uri, opts) => {
-          return Promise.resolve({});
-        }
-      }
+      loader: loader
     },
     width: getWidth(),
     height: getHeight(),
     padding: { left: 0, right: 0, top: 0, bottom: 0 },
-    actions: false
+    actions: false,
+    onBeforeParse: spec => {
+      if (!spec.autosize) {
+        spec.autosize = 'fit';
+      }
+      return spec;
+    }
   };
 
-  const viewP = new Promise((accept, reject) => {
-    embed($el.get(0), spec, opts, (err, v) => {
-      if (err) {
-        reject(err);
-      } else {
-        accept(v);
-      }
-    });
-  });
+  // FIXME: rework promises - it should be much more straightforward
+  const viewP = embed($el.get(0), spec, opts);
 
   class VegaView {
     promise() {
@@ -102,6 +105,41 @@ export function createVegaView($scope, el, spec, timefilter, es) {
         obj.gte = bounds.min.valueOf();
         obj.lte = bounds.max.valueOf();
         obj.format = 'epoch_millis';
+
+        if (obj['shift']) {
+          const shift = obj['shift'];
+          if (typeof shift !== 'number') {
+            throw new Error('shift must be a numeric value');
+          }
+          delete obj['shift'];
+          let unit = 'd';
+          if (obj['unit']) {
+            unit = obj['unit'];
+            delete obj['unit'];
+          }
+          let multiplier;
+          switch (unit) {
+            case 'w':
+              multiplier = 1000 * 60 * 60 * 24 * 7;
+              break;
+            case 'd':
+              multiplier = 1000 * 60 * 60 * 24;
+              break;
+            case 'h':
+              multiplier = 1000 * 60 * 60;
+              break;
+            case 'm':
+              multiplier = 1000 * 60;
+              break;
+            case 's':
+              multiplier = 1000;
+              break;
+            default:
+              throw new Error('Unknown unit value. Must be one of w,d,h,m,s');
+          }
+          obj.gte += shift * multiplier;
+          obj.lte += shift * multiplier;
+        }
       } else {
         for (const prop in obj) {
           if (obj.hasOwnProperty(prop)) {
