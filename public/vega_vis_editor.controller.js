@@ -18,18 +18,18 @@ export function createVegaVisEditorController(getAppState) {
     }
 
     formatJson() {
-      this._format(compactStringify);
+      this._format(compactStringify, { maxLength: 65 });
     }
 
     formatHJson() {
       this._format(hjson.stringify);
     }
 
-    _format(stringify) {
+    _format(stringify, opts) {
       // TODO: error handling and reporting
       try {
         const spec = hjson.parse(this.vis.params.spec);
-        this.vis.params.spec = stringify(spec);
+        this.vis.params.spec = stringify(spec, opts);
       } catch (err) {
         // FIXME!
         alert(err);

@@ -14,7 +14,10 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es) {
     link($scope, $el/*, $attr*/) {
       const resizeChecker = new ResizeChecker($el);
 
-      const onError = err => $el.text(err.message || err);
+      const onError = err => {
+        console.error(err);
+        $el.text(err.message || err);
+      };
 
       // FIXME? is this the right way to monitor timefilter?
       $scope.timefilter = timefilter;
