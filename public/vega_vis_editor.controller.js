@@ -5,12 +5,12 @@ import compactStringify from 'json-stringify-pretty-compact';
 export function createVegaVisEditorController(getAppState) {
 
   class VegaVisEditorController {
-    link($scope, $el, $attr) {
+    link($scope, /*$el, $attr*/) {
       $scope.$watchMulti(
-          ['=vegaEditor.vis.params'],
-          () =>
-            getAppState().save(true)
-            // this.persistAppState()
+        ['=vegaEditor.vis.params'],
+        () =>
+          getAppState().save(true)
+        // this.persistAppState()
       );
     }
     shouldShowSpyPanel() {

@@ -1,9 +1,11 @@
 import $ from 'jquery';
+import L from 'leaflet';
+import leafletVega from 'leaflet-vega';
 
 // Strangely, importing from vega-embed directly doesn't compile
 import embed from 'vega-embed/src/embed';
 
-export function createVegaView($scope, el, spec, timefilter, es) {
+export function createVegaView($scope, el, spec, timefilter, es, serviceSettings) {
   const $el = $(el);
 
   const getWidth = () => $el.width() - 100;
@@ -23,6 +25,15 @@ export function createVegaView($scope, el, spec, timefilter, es) {
     return defaultLoad(uri, opts);
   };
 
+  // // set up vega loggers to log to our device instead of stderr
+  // vega.logging.log = function (msg) {
+  //   log('debug/vega', msg);
+  // };
+  // vega.logging.error = function (msg) {
+  //   log('error/vega', msg);
+  //   //throw new Error(msg);
+  // };
+
   const opts = {
     viewConfig: {
       /**
@@ -38,7 +49,7 @@ export function createVegaView($scope, el, spec, timefilter, es) {
     },
     width: getWidth(),
     height: getHeight(),
-    padding: { left: 0, right: 0, top: 0, bottom: 0 },
+    padding: {left: 0, right: 0, top: 0, bottom: 0},
     actions: false,
     onBeforeParse: spec => {
       if (!spec.autosize) {
@@ -49,7 +60,39 @@ export function createVegaView($scope, el, spec, timefilter, es) {
   };
 
   // FIXME: rework promises - it should be much more straightforward
-  const viewP = embed($el.get(0), spec, opts);
+  const viewP = Promise.resolve().then(async () => {
+    if (!spec.baseMap) {
+      return;
+    }
+
+    const tmsService = await
+      serviceSettings.getTMSService();
+
+    // const minMax = tmsService.getMinMaxZoom();
+    const url = tmsService.getUrl();
+    const options = tmsService.getTMSOptions();
+
+    const leafletOptions = {
+      minZoom: options.minZoom,
+      maxZoom: options.maxZoom,
+      center: [0, 0],
+      zoom: 2
+    };
+
+    const map = L.map($el.get(0), leafletOptions);
+    const baseLayer = L.tileLayer(url, {
+      minZoom: options.minZoom,
+      maxZoom: options.maxZoom,
+      subdomains: options.subdomains || [],
+      attribution: options.attribution
+    });
+
+    baseLayer.addTo(map);
+  }).then(
+    () => embed($el.get(0), spec, opts)
+  );
+
+  // FIXME: handle runtime errors by overrwriting  vega.logging.error ...
 
   class VegaView {
     promise() {
@@ -65,39 +108,25 @@ export function createVegaView($scope, el, spec, timefilter, es) {
     }
 
     destroy() {
-      viewP.then(v=> v.view.finalize());
+      viewP.then(v=> {
+        v.view.finalize();
+        // while (this._layers.length) {
+        //   layer = this._layers.pop();
+        //   layer.removeFromLeafletMap(this._leafletMap);
+        // }
+        leafletMap.remove();
+
+      });
       $el.empty();
     }
   }
 
   function queryEsData(uri) {
-
-    updateTimeRecursive(uri);
-
-    return es.search(uri).then(resp => {
-      // FIXME - report warnings?
-      if (resp.hits) {
-        if (resp.hits.total < 1) {
-          $scope.status = 'notFound';
-        } else {
-          $scope.status = 'found';
-          $scope.hit = resp.hits.hits[0];
-        }
-      }
-      // return JSON.stringify(resp);
-      return resp;
-    }).catch(err => {
-      // FIXME - report errors
-      if (err.status === 404) {
-        $scope.status = 'notFound';
-      } else {
-        $scope.status = 'error';
-        $scope.resp = err;
-      }
-    });
+    injectTimeRange(uri);
+    return es.search(uri);
   }
 
-  function updateTimeRecursive(obj) {
+  function injectTimeRange(obj) {
     if (obj && typeof obj === 'object') {
       if (obj['%timefilter%']) {
         delete obj['%timefilter%'];
@@ -143,7 +172,7 @@ export function createVegaView($scope, el, spec, timefilter, es) {
       } else {
         for (const prop in obj) {
           if (obj.hasOwnProperty(prop)) {
-            updateTimeRecursive(obj[prop]);
+            injectTimeRange(obj[prop]);
           }
         }
       }

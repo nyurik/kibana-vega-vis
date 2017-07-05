@@ -1,22 +1,24 @@
 import { ResizeCheckerProvider } from 'ui/resize_checker';
-//import { AggResponseTabifyProvider } from 'ui/agg_response/tabify/tabify';
+import { Notifier } from 'ui/notify';
 
 import { createVegaView } from './vega_view';
 // import moment from 'moment';
 
 import hjson from 'hjson';
 
-export function createVegaVisController(Private, /*$scope,*/ timefilter, es) {
+export function createVegaVisController(Private, /*$scope,*/ timefilter, es, serviceSettings) {
   const ResizeChecker = Private(ResizeCheckerProvider);
   // const tabify = Private(AggResponseTabifyProvider);
 
   class VegaVisController {
     link($scope, $el/*, $attr*/) {
       const resizeChecker = new ResizeChecker($el);
+      const notify = new Notifier({ location: 'Vega' });
 
       const onError = err => {
         console.error(err);
-        $el.text(err.message || err);
+        notify.error(err);
+        // $el.text(err.message || err);
       };
 
       // FIXME? is this the right way to monitor timefilter?
@@ -24,7 +26,10 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es) {
       $scope.$watchMulti(['=vega.vis.params', '=timefilter'], () => {
         try {
           const spec = hjson.parse($scope.vega.vis.params.spec);
-          this.vegaView = createVegaView($scope, $el.get(0), spec, timefilter, es);
+          if (this.vegaView) {
+            this.vegaView.destroy();
+          }
+          this.vegaView = createVegaView($scope, $el.get(0), spec, timefilter, es, serviceSettings);
           this.vegaView.promise().catch(onError);
         } catch (err) {
           onError(err);
