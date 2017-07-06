@@ -1,0 +1,6 @@
+<ul ng-if="vega.messages.length" class="vega-messages">
+  <li ng-repeat="message in vega.messages">
+    <pre ng-if="message.type !== 'error'">{{message | json}}</pre>
+    <pre ng-if="message.type === 'error'">{{message.error.stack}}</pre>
+  </li>
+</ul>

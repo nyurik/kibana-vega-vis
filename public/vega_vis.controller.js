@@ -1,7 +1,7 @@
 import { ResizeCheckerProvider } from 'ui/resize_checker';
 import { Notifier } from 'ui/notify';
 
-import { createVegaView } from './vega_view';
+import { VegaView } from './vega_view';
 // import moment from 'moment';
 
 import hjson from 'hjson';
@@ -11,42 +11,45 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
   // const tabify = Private(AggResponseTabifyProvider);
 
   class VegaVisController {
+    messages = []
+    onMessage(msg) {
+      this.messages.push(msg);
+    }
+
     link($scope, $el/*, $attr*/) {
       const resizeChecker = new ResizeChecker($el);
-      const notify = new Notifier({ location: 'Vega' });
-
-      const onError = err => {
-        console.error(err);
-        notify.error(err);
-        // $el.text(err.message || err);
-      };
 
       // FIXME? is this the right way to monitor timefilter?
       $scope.timefilter = timefilter;
-      $scope.$watchMulti(['=vega.vis.params', '=timefilter'], () => {
+      $scope.$watchMulti(['=vega.vis.params', '=timefilter'], async () => {
+        this.messages = [];
+
         try {
           const spec = hjson.parse($scope.vega.vis.params.spec);
           if (this.vegaView) {
-            this.vegaView.destroy();
+            await this.vegaView.destroy();
           }
-          this.vegaView = createVegaView($scope, $el.get(0), spec, timefilter, es, serviceSettings);
-          this.vegaView.promise().catch(onError);
-        } catch (err) {
-          onError(err);
+          this.vegaView = new VegaView($el, spec, timefilter, es, serviceSettings, msg => this.onMessage(msg));
+          await this.vegaView.init();
+        } catch (error) {
+          this.onMessage({ type: 'error', error });
         }
 
-        resizeChecker.modifySizeWithoutTriggeringResize(() => {
-          this.vegaView.resize();
+        resizeChecker.modifySizeWithoutTriggeringResize(async () => {
+          // await this.vegaView.resize();
         });
       });
 
       resizeChecker.on('resize', () => {
-        resizeChecker.modifySizeWithoutTriggeringResize(() => {
-          this.vegaView.resize();
+        resizeChecker.modifySizeWithoutTriggeringResize(async () => {
+          // await this.vegaView.resize();
         });
       });
+
       $scope.$on('$destroy', () => {
-        this.vegaView.destroy();
+        this.vegaView.destroy().catch(error => {
+          this.onMessage({ type: 'error', error });
+        });
       });
     }
     //

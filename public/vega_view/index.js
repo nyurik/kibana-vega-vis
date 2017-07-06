@@ -1,1 +1,1 @@
-export { createVegaView } from './vega_view';
+export { VegaView } from './vega_view';
