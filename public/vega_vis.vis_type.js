@@ -18,7 +18,7 @@ function VegaVisProvider(Private) {
   return VisFactory.createAngularVisualization({
     name: 'vega',
     title: 'Vega Vis',
-    description: 'Vega vis',
+    description: '',
     icon: 'fa-code',
     visConfig: {
       template: `<vega-vis vis="vis" es-response="esResponse"></vega-vis>`,
@@ -41,5 +41,3 @@ function VegaVisProvider(Private) {
     category: CATEGORY.OTHER
   });
 };
-
-export default VegaVisProvider;
