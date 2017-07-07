@@ -26,14 +26,14 @@ export function parseInputSpec(inputSpec, onWarning) {
 
   const baseMapSpec = spec.baseMap;
   if (baseMapSpec) {
-    if (schema.library === 'vega-lite') {
-      throw new Error('"baseMap" configuration is not compatible with vega-lite spec');
-    }
-
     delete spec.baseMapSpec;
   }
 
   if (schema.library === 'vega-lite') {
+    if (baseMapSpec) {
+      throw new Error('"baseMap" configuration is not compatible with vega-lite spec');
+    }
+
     spec = vegaLite.compile(spec).spec;
   }
 
