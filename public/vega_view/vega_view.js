@@ -10,11 +10,13 @@ import { createVegaLoader } from './vega_loader';
 export class VegaView {
   constructor(parentEl, inputSpec, timefilter, es, serviceSettings, onMessage) {
     this._onMessage = onMessage;
+    this._parentEl = parentEl;
+    this._serviceSettings = serviceSettings;
+
     const parsed = parseInputSpec(inputSpec, (warning) => this._onMessage({ type: 'warning', warning }));
     this._spec = parsed.spec;
     this._baseMapSpec = parsed.baseMapSpec;
-    this._parentEl = parentEl;
-    this._serviceSettings = serviceSettings;
+
     this._viewConfig = {
       loader: createVegaLoader(es, timefilter)
     };
@@ -28,9 +30,9 @@ export class VegaView {
     });
 
     if (this._baseMapSpec) {
-      await this._initBaseMap();
+      await this._initLeafletVega();
     } else {
-      await this._initVega();
+      await this._initRawVega();
     }
   }
 
@@ -56,7 +58,8 @@ export class VegaView {
     }
   }
 
-  _destroyHandlers = []
+  _destroyHandlers = [];
+
   _addDestroyHandler(handler) {
     if (this._destroyHandlers) {
       this._destroyHandlers.push(handler);
@@ -65,7 +68,7 @@ export class VegaView {
     }
   }
 
-  async _initVega() {
+  async _initRawVega() {
     const view = new vega.View(vega.parse(this._spec), this._viewConfig);
 
     view.warn = (warning) => {
@@ -108,17 +111,22 @@ export class VegaView {
     });
   }
 
-  async _initBaseMap() {
+  async _initLeafletVega() {
     const tmsService = await this._serviceSettings.getTMSService();
 
     const url = tmsService.getUrl();
     const options = tmsService.getTMSOptions();
 
+    const delayRepaint = this._baseMapSpec.delayRepaint === undefined ? true : this._baseMapSpec.delayRepaint;
+    const lon = this._baseMapSpec.longitude || 0;
+    const lat = this._baseMapSpec.latitude || 0;
+    const zoom = this._baseMapSpec.zoom === undefined ? 2 : this._baseMapSpec.zoom;
+
     const map = L.map(this._$container.get(0), {
       minZoom: options.minZoom,
       maxZoom: options.maxZoom,
-      center: [0, 0],
-      zoom: 2
+      center: [lon, lat],
+      zoom: Math.min(options.maxZoom, Math.max(options.minZoom, zoom))
     });
 
     const baseLayer = L
@@ -131,12 +139,12 @@ export class VegaView {
       .addTo(map);
 
     const vegaLayer = L
-      .vega(this._spec, { vega, viewConfig: this._viewConfig })
+      .vega(this._spec, { vega, delayRepaint, viewConfig: this._viewConfig })
       .addTo(map);
 
     this._addDestroyHandler(() => {
-      map.removeLayer(baseLayer);
       map.removeLayer(vegaLayer);
+      map.removeLayer(baseLayer);
       map.remove();
     });
   }
