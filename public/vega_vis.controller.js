@@ -11,7 +11,7 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
   // const tabify = Private(AggResponseTabifyProvider);
 
   class VegaVisController {
-    messages = []
+    messages = [];
     onMessage(msg) {
       this.messages.push(msg);
     }

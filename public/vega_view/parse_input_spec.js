@@ -37,7 +37,7 @@ export function parseInputSpec(inputSpec, onWarning) {
     spec = vegaLite.compile(spec).spec;
   }
 
-  if (!spec.autosize) {
+  if (spec.autosize === undefined) {
     spec.autosize = 'fit';
   }
 
