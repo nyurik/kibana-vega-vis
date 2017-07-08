@@ -47,14 +47,12 @@ export class VegaView {
   // }
 
   async destroy() {
-    if (!this._destroyHandlers) {
-      throw new Error('VegaView already destroyed');
-    }
-
-    const handlers = this._destroyHandlers;
-    this._destroyHandlers = null;
-    for (const handler of handlers) {
-      await handler();
+    if (this._destroyHandlers) {
+      const handlers = this._destroyHandlers;
+      this._destroyHandlers = null;
+      for (const handler of handlers) {
+        await handler();
+      }
     }
   }
 
