@@ -103,7 +103,7 @@ export class VegaView {
 
     if (this._supportHover) view.hover();
 
-    view.run();
+    await view.runAsync();
 
     // if (view._pending) {
     //   await view._pending;
@@ -128,7 +128,7 @@ export class VegaView {
     const map = L.map(this._$container.get(0), {
       minZoom: options.minZoom,
       maxZoom: options.maxZoom,
-      center: [lon, lat],
+      center: [lat, lon],
       zoom: Math.min(options.maxZoom, Math.max(options.minZoom, zoom))
     });
 
