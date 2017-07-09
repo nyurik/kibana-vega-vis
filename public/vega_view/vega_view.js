@@ -28,6 +28,7 @@ export class VegaView {
     this._heightPadding = heightPadding;
     this._mapConfig = mapConfig;
     this._supportHover = supportHover;
+    this._view = null;
 
     this._viewConfig = {
       loader: createVegaLoader(es, timefilter),
@@ -51,13 +52,11 @@ export class VegaView {
   }
 
   resize() {
-    // needs to wait for init() to complete and return promise for when
-    // resize is complete, and not resize when destroyed
-    viewP.then(v =>
-      v.view
-        .width(this._$container.width())
-        .height(this._$container.height())
-        .run());
+    if (this._view && this.updateVegaSize(this._view)) {
+      return this._view.runAsync();
+    } else {
+      return Promise.resolve();
+    }
   }
 
   async destroy() {
@@ -81,9 +80,13 @@ export class VegaView {
   }
 
   updateVegaSize(view) {
-    view
-      .width(this._$container.width() - this._widthPadding)
-      .height(this._$container.height() - this._heightPadding);
+    const width = this._$container.width() - this._widthPadding;
+    const height = this._$container.height() - this._heightPadding;
+    if (view.width() !== width || view.height() !== height) {
+      view.width(width).height(height);
+      return true;
+    }
+    return false;
   }
 
   async _initRawVega() {
@@ -103,15 +106,13 @@ export class VegaView {
 
     if (this._supportHover) view.hover();
 
-    await view.runAsync();
-
-    // if (view._pending) {
-    //   await view._pending;
-    // }
-
     this._addDestroyHandler(() => {
+      this._view = null;
       view.finalize();
     });
+
+    await view.runAsync();
+    this._view = view;
   }
 
   async _initLeafletVega() {
