@@ -12,27 +12,27 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
 
   class VegaVisController {
     messages = [];
-    onMessage(msg) {
-      this.messages.push(msg);
-    }
+    onError = (error) => this.messages.push({ type: 'error', error });
+    onWarn = (warning) => this.messages.push({ type: 'warning', warning });
 
     link($scope, $el/*, $attr*/) {
       const resizeChecker = new ResizeChecker($el);
 
-      // FIXME? is this the right way to monitor timefilter?
       $scope.timefilter = timefilter;
       $scope.$watchMulti(['=vega.vis.params', '=timefilter'], async () => {
         this.messages = [];
+
+        // FIXME!!  need to debounce editor changes
 
         try {
           const spec = hjson.parse($scope.vega.vis.params.spec);
           if (this.vegaView) {
             await this.vegaView.destroy();
           }
-          this.vegaView = new VegaView($el, spec, timefilter, es, serviceSettings, msg => this.onMessage(msg));
+          this.vegaView = new VegaView($el, spec, timefilter, es, serviceSettings, this.onError, this.onWarn);
           await this.vegaView.init();
         } catch (error) {
-          this.onMessage({ type: 'error', error });
+          this.onError(error);
         }
 
         resizeChecker.modifySizeWithoutTriggeringResize(async () => {
@@ -47,9 +47,7 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
       });
 
       $scope.$on('$destroy', () => {
-        this.vegaView.destroy().catch(error => {
-          this.onMessage({ type: 'error', error });
-        });
+        this.vegaView.destroy().catch(error => this.onError(error));
       });
     }
     //
