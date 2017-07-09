@@ -35,15 +35,11 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
           this.onError(error);
         }
 
-        resizeChecker.modifySizeWithoutTriggeringResize(async () => {
-          // await this.vegaView.resize();
-        });
+        resizeChecker.modifySizeWithoutTriggeringResize(() => this.vegaView.resize());
       });
 
       resizeChecker.on('resize', () => {
-        resizeChecker.modifySizeWithoutTriggeringResize(async () => {
-          // await this.vegaView.resize();
-        });
+        resizeChecker.modifySizeWithoutTriggeringResize(() => this.vegaView.resize());
       });
 
       $scope.$on('$destroy', () => {

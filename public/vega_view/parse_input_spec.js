@@ -25,13 +25,12 @@ export function parseInputSpec(inputSpec, onWarning) {
 
   const schema = schemaParser(spec.$schema);
   const isVegaLite = schema.library === 'vega-lite';
-  const ourVersion = isVegaLite ? vegaLite.version : vega.version;
-  const ourVersionIsOld = versionCompare(schema.version, ourVersion) > 0;
+  const libVersion = isVegaLite ? vegaLite.version : vega.version;
 
-  if (ourVersionIsOld) {
+  if (versionCompare(schema.version, libVersion) > 0) {
     onWarning(
       `The input spec uses "${schema.library}" ${schema.version}, but ` +
-      `current version of "${schema.library}" is ${ourVersion}.`
+      `current version of "${schema.library}" is ${libVersion}.`
     );
   }
 
@@ -39,6 +38,10 @@ export function parseInputSpec(inputSpec, onWarning) {
   if (mapConfig) {
     delete spec._map;
   }
+
+  // preserve padding and autosize before Vega-Lite compiler
+  const padding = spec.padding;
+  const autosize = spec.autosize;
 
   if (isVegaLite) {
     if (mapConfig) {
@@ -48,19 +51,17 @@ export function parseInputSpec(inputSpec, onWarning) {
     spec = vegaLite.compile(spec).spec;
   }
 
-  const padding = spec.padding;
   let widthPadding = 0;
   let heightPadding = 0;
 
   // Convert default Vega padding into the width/height shift at the bottom/right
   // TODO: we might want to do this differently, e.g. by creating a separate container
   // for the vega-created controls
-  if (padding) {
+  delete spec.padding;
+  if (padding !== undefined) {
     if (mapConfig) {
       onWarning(`"padding" is not supported with the "_map"`);
     }
-
-    delete spec.padding;
 
     if (typeof padding === 'number') {
       heightPadding += padding;
@@ -70,12 +71,7 @@ export function parseInputSpec(inputSpec, onWarning) {
     }
   }
 
-  // const margin = spec._margin;
-  // if (margin) {
-  //   delete spec._margin;
-  // }
-
-  if (spec.autosize === undefined) {
+  if (autosize === undefined) {
     spec.autosize = 'fit';
   }
 
