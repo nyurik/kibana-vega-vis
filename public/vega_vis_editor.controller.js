@@ -8,8 +8,7 @@ export function createVegaVisEditorController(getAppState) {
     link($scope, /*$el, $attr*/) {
       $scope.$watchMulti(
         ['=vegaEditor.vis.params'],
-        () =>
-          getAppState().save(true)
+        () => getAppState().save(true)
         // this.persistAppState()
       );
     }

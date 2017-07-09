@@ -8,17 +8,31 @@ import { createVegaLoader } from './vega_loader';
 
 // FIXME: handle runtime errors by overrwriting  vega.logging.error ...
 export class VegaView {
-  constructor(parentEl, inputSpec, timefilter, es, serviceSettings, onMessage) {
-    this._onMessage = onMessage;
+  constructor(parentEl, inputSpec, timefilter, es, serviceSettings, onError, onWarn) {
+    this._onWarn = onWarn;
+    this._onError = (errOrMessage) => {
+      const error = errOrMessage instanceof Error
+        ? errOrMessage
+        : new Error(errOrMessage);
+
+      onError(error);
+      throw error;
+    };
+
     this._parentEl = parentEl;
     this._serviceSettings = serviceSettings;
 
-    const parsed = parseInputSpec(inputSpec, (warning) => this._onMessage({ type: 'warning', warning }));
-    this._spec = parsed.spec;
-    this._baseMapSpec = parsed.baseMapSpec;
+    const { spec, widthPadding, heightPadding, mapConfig, supportHover } = parseInputSpec(inputSpec, this._onWarn);
+    this._spec = spec;
+    this._widthPadding = widthPadding;
+    this._heightPadding = heightPadding;
+    this._mapConfig = mapConfig;
+    this._supportHover = supportHover;
 
     this._viewConfig = {
-      loader: createVegaLoader(es, timefilter)
+      loader: createVegaLoader(es, timefilter),
+      logLevel: vega.Warn,
+      renderer: 'canvas',
     };
   }
 
@@ -29,22 +43,22 @@ export class VegaView {
       this._$container = null;
     });
 
-    if (this._baseMapSpec) {
+    if (this._mapConfig) {
       await this._initLeafletVega();
     } else {
       await this._initRawVega();
     }
   }
 
-  // resize() {
-  //   // needs to wait for init() to complete and return promise for when
-  //   // resize is complete, and not resize when destroyed
-  //   viewP.then(v =>
-  //     v.view
-  //       .width(getWidth())
-  //       .height(getHeight())
-  //       .run());
-  // }
+  resize() {
+    // needs to wait for init() to complete and return promise for when
+    // resize is complete, and not resize when destroyed
+    viewP.then(v =>
+      v.view
+        .width(this._$container.width())
+        .height(this._$container.height())
+        .run());
+  }
 
   async destroy() {
     if (this._destroyHandlers) {
@@ -66,43 +80,34 @@ export class VegaView {
     }
   }
 
+  updateVegaSize(view) {
+    view
+      .width(this._$container.width() - this._widthPadding)
+      .height(this._$container.height() - this._heightPadding);
+  }
+
   async _initRawVega() {
     const view = new vega.View(vega.parse(this._spec), this._viewConfig);
+    view.warn = this._onWarn;
+    view.error = this._onError;
+    this.updateVegaSize(view);
 
-    view.warn = (warning) => {
-      this._onMessage({ type: 'warning', warning });
-    };
+    view.padding({
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0
+    });
 
-    view.error = (errOrMessage) => {
-      const error = errOrMessage instanceof Error
-        ? errOrMessage
-        : new Error(errOrMessage);
+    view.initialize(this._$container.get(0));
 
-      this._onMessage({ type: 'error', error });
-      throw error;
-    };
+    if (this._supportHover) view.hover();
 
-    view
-      .initialize(this._$container.get(0))
-      .width(() => {
-        console.log('width', this._$container.width() - 100);
-        return this._$container.width() - 100;
-      })
-      .height(() => {
-        console.log('height', this._$container.height() - 100);
-        return this._$container.height() - 100;
-      })
-      .padding({
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0
-      })
-      .run();
+    view.run();
 
-    if (view._pending) {
-      await view._pending;
-    }
+    // if (view._pending) {
+    //   await view._pending;
+    // }
 
     this._addDestroyHandler(() => {
       view.finalize();
@@ -115,10 +120,10 @@ export class VegaView {
     const url = tmsService.getUrl();
     const options = tmsService.getTMSOptions();
 
-    const delayRepaint = this._baseMapSpec.delayRepaint === undefined ? true : this._baseMapSpec.delayRepaint;
-    const lon = this._baseMapSpec.longitude || 0;
-    const lat = this._baseMapSpec.latitude || 0;
-    const zoom = this._baseMapSpec.zoom === undefined ? 2 : this._baseMapSpec.zoom;
+    const delayRepaint = this._mapConfig.delayRepaint === undefined ? true : this._mapConfig.delayRepaint;
+    const lon = this._mapConfig.longitude || 0;
+    const lat = this._mapConfig.latitude || 0;
+    const zoom = this._mapConfig.zoom === undefined ? 2 : this._mapConfig.zoom;
 
     const map = L.map(this._$container.get(0), {
       minZoom: options.minZoom,
@@ -137,7 +142,13 @@ export class VegaView {
       .addTo(map);
 
     const vegaLayer = L
-      .vega(this._spec, { vega, delayRepaint, viewConfig: this._viewConfig })
+      .vega(this._spec, {
+        vega,
+        delayRepaint,
+        viewConfig: this._viewConfig,
+        onWarning: this._onWarn,
+        onError: this._onError
+      })
       .addTo(map);
 
     this._addDestroyHandler(() => {
