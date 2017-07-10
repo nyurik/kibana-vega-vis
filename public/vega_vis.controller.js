@@ -8,7 +8,6 @@ import hjson from 'hjson';
 
 export function createVegaVisController(Private, /*$scope,*/ timefilter, es, serviceSettings) {
   const ResizeChecker = Private(ResizeCheckerProvider);
-  // const tabify = Private(AggResponseTabifyProvider);
 
   class VegaVisController {
     messages = [];
