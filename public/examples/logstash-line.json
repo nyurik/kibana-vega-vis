@@ -11,6 +11,7 @@
         "index": "logstash-*",
         "body": {
           "query": {"range": {"@timestamp": {"%timefilter%": true}}},
+          "size": 0,
           "aggs": {
             "hist": {
               "date_histogram": {
