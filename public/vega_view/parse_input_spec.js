@@ -71,7 +71,8 @@ export function parseInputSpec(inputSpec, onWarning) {
     }
   }
 
-  if (autosize === undefined) {
+  // Default autosize should be fit, unless it's a map (leaflet-vega handles that)
+  if (autosize === undefined && !mapConfig) {
     spec.autosize = 'fit';
   }
 
