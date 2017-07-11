@@ -10,24 +10,17 @@ import { createVegaLoader } from './vega_loader';
 export class VegaView {
   constructor(parentEl, inputSpec, timefilter, es, serviceSettings, onError, onWarn) {
     this._onWarn = onWarn;
-    this._onError = (errOrMessage) => {
-      const error = errOrMessage instanceof Error
-        ? errOrMessage
-        : new Error(errOrMessage);
-
-      onError(error);
-      throw error;
-    };
-
+    this._onError = onError;
     this._parentEl = parentEl;
     this._serviceSettings = serviceSettings;
 
-    const { spec, widthPadding, heightPadding, mapConfig, supportHover } = parseInputSpec(inputSpec, this._onWarn);
+    const { spec, paddingWidth, paddingHeight, mapConfig, useResize, useHover } = parseInputSpec(inputSpec, this._onWarn);
     this._spec = spec;
-    this._widthPadding = widthPadding;
-    this._heightPadding = heightPadding;
+    this._paddingWidth = paddingWidth;
+    this._paddingHeight = paddingHeight;
     this._mapConfig = mapConfig;
-    this._supportHover = supportHover;
+    this._useResize = useResize;
+    this._useHover = useHover;
     this._view = null;
 
     this._viewConfig = {
@@ -39,9 +32,12 @@ export class VegaView {
 
   async init() {
     this._$container = $('<div class="vega-view-container">').appendTo(this._parentEl);
+    this._$controls = $('<div class="vega-controls-container">').appendTo(this._parentEl);
     this._addDestroyHandler(() => {
       this._$container.remove();
       this._$container = null;
+      this._$controls.remove();
+      this._$controls = null;
     });
 
     if (this._mapConfig) {
@@ -52,7 +48,7 @@ export class VegaView {
   }
 
   resize() {
-    if (this._view && this.updateVegaSize(this._view)) {
+    if (this._useResize && this._view && this.updateVegaSize(this._view)) {
       return this._view.runAsync();
     } else {
       return Promise.resolve();
@@ -80,8 +76,8 @@ export class VegaView {
   }
 
   updateVegaSize(view) {
-    const width = this._$container.width() - this._widthPadding;
-    const height = this._$container.height() - this._heightPadding;
+    const width = Math.max(0, this._$container.width() - this._paddingWidth);
+    const height = Math.max(0, this._$container.height() - this._paddingHeight);
     if (view.width() !== width || view.height() !== height) {
       view.width(width).height(height);
       return true;
@@ -93,18 +89,10 @@ export class VegaView {
     const view = new vega.View(vega.parse(this._spec), this._viewConfig);
     view.warn = this._onWarn;
     view.error = this._onError;
-    this.updateVegaSize(view);
+    if (this._useResize) this.updateVegaSize(view);
+    view.initialize(this._$container.get(0), this._$controls.get(0));
 
-    view.padding({
-      left: 0,
-      right: 0,
-      top: 0,
-      bottom: 0
-    });
-
-    view.initialize(this._$container.get(0));
-
-    if (this._supportHover) view.hover();
+    if (this._useHover) view.hover();
 
     this._addDestroyHandler(() => {
       this._view = null;
@@ -145,6 +133,7 @@ export class VegaView {
     const vegaLayer = L
       .vega(this._spec, {
         vega,
+        bindingsContainer: this._$controls.get(0),
         delayRepaint,
         viewConfig: this._viewConfig,
         onWarning: this._onWarn,

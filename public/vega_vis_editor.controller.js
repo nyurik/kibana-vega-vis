@@ -12,8 +12,9 @@ export function createVegaVisEditorController(getAppState) {
         // this.persistAppState()
       );
     }
+
     shouldShowSpyPanel() {
-      return chrome.getVisible();
+      return false;
     }
 
     formatJson() {
