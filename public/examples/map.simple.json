@@ -6,6 +6,49 @@
     "longitude": -74,
     "zoom": 4
   },
+  "signals": [
+    {
+      "name": "colors",
+      "value": "Blues",
+      "bind": {
+        "input": "select",
+        "options": [
+          "Blues",
+          "Greens",
+          "Greys",
+          "Purples",
+          "Reds",
+          "Oranges",
+          "BlueOrange",
+          "BrownBlueGreen",
+          "PurpleGreen",
+          "PinkYellowGreen",
+          "PurpleOrange",
+          "RedBlue",
+          "RedGrey",
+          "RedYellowBlue",
+          "RedYellowGreen",
+          "BlueGreen",
+          "BluePurple",
+          "GreenBlue",
+          "OrangeRed",
+          "PurpleBlueGreen",
+          "PurpleBlue",
+          "PurpleRed",
+          "RedPurple",
+          "YellowGreenBlue",
+          "YellowGreen",
+          "YellowOrangeBrown",
+          "YellowOrangeRed"
+        ]
+      }
+    },
+    {
+      "name": "colorCount",
+      "value": 9,
+      "bind": {"input": "range", "min": 3, "max": 9, "step": 2}
+    }
+  ],
   "data": [
     {
       "name": "unemp",
@@ -38,7 +81,7 @@
       "name": "color",
       "type": "quantize",
       "domain": [0, 0.15],
-      "range": {"scheme": "blues-9"}
+      "range": {"scheme": {"signal": "colors+'-'+colorCount"}}
     }
   ],
   "marks": [

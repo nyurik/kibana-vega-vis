@@ -18,42 +18,41 @@ vega-vis {
     z-index: 0;
     flex: 1 1 100%;
 
-    // TODO: This used to be "flex", but that made controls appear on the right
     display: block;
     max-width: 100%;
     max-height: 100%;
+  }
 
-    .vega-bindings {
-      //display: flex;
-      //flex-direction: row;
-      flex: none;
-      font-size: 14px;
-      line-height: 20px;
+  .vega-controls-container {
+    flex: none;
+    font-size: 14px;
+    line-height: 20px;
 
-      > .vega-bind {
-        flex: 1; /*grow*/
-      }
+    > .vega-bind {
+      flex: 1; /*grow*/
 
       .vega-bind-name {
         display: inline-block;
         width: 105px;
       }
-      .vega-bind input[type="range"] {
-        padding: 0;
-        width: 200px;
+
+      input[type="range"] {
+        width: 120px;
         color: rgb(157, 150, 142);
         display: inline-block;
-        margin: 3px;
+        vertical-align: middle;
       }
-      .vega-bind select {
+
+      label {
+        margin: 0 0 0 0.6em;
+      }
+
+      select {
         max-width: 200px;
       }
-      .vega-bind label {
-        margin-left: 4px;
-      }
+
       .vega-bind-radio label {
-        margin-left: 0;
-        margin-right: 4px;
+        margin: 0 0.6em 0 0.3em;
       }
     }
   }

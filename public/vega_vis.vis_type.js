@@ -33,7 +33,7 @@ ui-state="uiState"
 ></vega-vis-editor>`
     },
     // implementsRenderComplete: true,
-    requiresSearch: false,
+    requiresSearch: true,
     requiresTimePicker: true,
     fullEditor: true,
     category: VisType.CATEGORY.OTHER

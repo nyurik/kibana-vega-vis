@@ -39,8 +39,7 @@ export function parseInputSpec(inputSpec, onWarning) {
     delete spec._map;
   }
 
-  // preserve padding and autosize before Vega-Lite compiler
-  const padding = spec.padding;
+  // preserve autosize before Vega-Lite compiler
   const autosize = spec.autosize;
 
   if (isVegaLite) {
@@ -51,30 +50,30 @@ export function parseInputSpec(inputSpec, onWarning) {
     spec = vegaLite.compile(spec).spec;
   }
 
-  let widthPadding = 0;
-  let heightPadding = 0;
-
-  // Convert default Vega padding into the width/height shift at the bottom/right
-  // TODO: we might want to do this differently, e.g. by creating a separate container
-  // for the vega-created controls
-  delete spec.padding;
-  if (padding !== undefined) {
-    if (mapConfig) {
-      onWarning(`"padding" is not supported with the "_map"`);
-    }
-
-    if (typeof padding === 'number') {
-      heightPadding += padding;
-    } else {
-      if (padding.right) widthPadding += padding.right;
-      if (padding.bottom) heightPadding += padding.bottom;
-    }
-  }
-
   // Default autosize should be fit, unless it's a map (leaflet-vega handles that)
   if (autosize === undefined && !mapConfig) {
     spec.autosize = 'fit';
   }
 
-  return { spec, widthPadding, heightPadding, mapConfig, supportHover: !isVegaLite };
+  const useResize = !isVegaLite && !mapConfig && spec.autosize === 'fit';
+
+  // Padding is not included in the width/height (unless a new autosize mode is introduced)
+  let paddingWidth = 0;
+  let paddingHeight = 0;
+  if (useResize && spec.padding) {
+    if (typeof spec.padding === 'object') {
+      paddingWidth += (+spec.padding.left || 0) + (+spec.padding.right || 0);
+      paddingHeight += (+spec.padding.top || 0) + (+spec.padding.bottom || 0);
+    } else {
+      paddingWidth += 2 * (+spec.padding || 0);
+      paddingHeight += 2 * (+spec.padding || 0);
+    }
+  }
+
+  if (useResize && (spec.width || spec.height)) {
+    onWarning('The "width" and "height" params will be ignored ');
+  }
+
+  return {
+    spec, paddingWidth, paddingHeight, mapConfig, useResize, useHover: !isVegaLite };
 }
