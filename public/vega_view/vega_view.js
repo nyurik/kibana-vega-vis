@@ -15,6 +15,8 @@ export class VegaView {
     this._serviceSettings = serviceSettings;
 
     this._specParams = parseInputSpec(inputSpec, this._onWarn);
+    this._parentEl.css('flex-direction', this._specParams.containerDir);
+
     this._view = null;
 
     this._viewConfig = {
@@ -26,7 +28,10 @@ export class VegaView {
 
   async init() {
     this._$container = $('<div class="vega-view-container">').appendTo(this._parentEl);
-    this._$controls = $('<div class="vega-controls-container">').appendTo(this._parentEl);
+    this._$controls = $('<div class="vega-controls-container">')
+      .css('flex-direction', this._specParams.controlsDir)
+      .appendTo(this._parentEl);
+
     this._addDestroyHandler(() => {
       this._$container.remove();
       this._$container = null;

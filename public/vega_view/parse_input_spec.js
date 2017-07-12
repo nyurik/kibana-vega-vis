@@ -5,8 +5,15 @@ import versionCompare from 'compare-versions';
 
 const DEFAULT_SCHEMA = 'https://vega.github.io/schema/vega/v3.0.json';
 
+const locToDirMap = {
+  left: 'row-reverse',
+  right: 'row',
+  top: 'column-reverse',
+  bottom: 'column'
+};
+
 export function parseInputSpec(inputSpec, onWarning) {
-  let spec = { ...inputSpec };
+  let spec = {...inputSpec};
 
   if (!spec.$schema) {
     onWarning(`The input spec does not specify a "$schema", defaulting to "${DEFAULT_SCHEMA}"`);
@@ -59,6 +66,25 @@ export function parseInputSpec(inputSpec, onWarning) {
     delayRepaint = delayRepaint === undefined ? true : delayRepaint;
   }
 
+  // Calculate container-direction CSS property for binding placement
+  const controlsLocation = hostConfig && hostConfig.controlsLocation;
+  let containerDir = locToDirMap[controlsLocation];
+  if (containerDir === undefined) {
+    if (controlsLocation === undefined) {
+      containerDir = 'column';
+    } else {
+      throw new Error('Unrecognized controlsLocation value. Expecting one of ["' +
+          locToDirMap.keys().join('", "') +
+          '"]'
+      );
+    }
+  }
+  const controlsDirection = hostConfig && hostConfig.controlsDirection;
+  if (controlsDirection !== undefined && controlsDirection !== 'horizontal' && controlsDirection !== 'vertical') {
+    throw new Error('Unrecognized controlsDirection value. Expecting one of ["horizontal", "vertical"]');
+  }
+  const controlsDir = controlsDirection === 'horizontal' ? 'row' : 'column';
+
   if (isVegaLite) {
     if (useMap) {
       throw new Error('"_map" configuration is not compatible with vega-lite spec');
@@ -92,5 +118,8 @@ export function parseInputSpec(inputSpec, onWarning) {
     onWarning('The \'width\' and \'height\' params are ignored with autosize=fit');
   }
 
-  return { spec, paddingWidth, paddingHeight, useMap, latitude, longitude, zoom, delayRepaint, useResize, useHover };
+  return {
+    spec, paddingWidth, paddingHeight, useMap, latitude, longitude, zoom, delayRepaint,
+    useResize, useHover, containerDir, controlsDir
+  };
 }
