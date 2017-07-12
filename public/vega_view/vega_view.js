@@ -14,13 +14,7 @@ export class VegaView {
     this._parentEl = parentEl;
     this._serviceSettings = serviceSettings;
 
-    const { spec, paddingWidth, paddingHeight, mapConfig, useResize, useHover } = parseInputSpec(inputSpec, this._onWarn);
-    this._spec = spec;
-    this._paddingWidth = paddingWidth;
-    this._paddingHeight = paddingHeight;
-    this._mapConfig = mapConfig;
-    this._useResize = useResize;
-    this._useHover = useHover;
+    this._specParams = parseInputSpec(inputSpec, this._onWarn);
     this._view = null;
 
     this._viewConfig = {
@@ -40,7 +34,7 @@ export class VegaView {
       this._$controls = null;
     });
 
-    if (this._mapConfig) {
+    if (this._specParams.useMap) {
       await this._initLeafletVega();
     } else {
       await this._initRawVega();
@@ -48,7 +42,7 @@ export class VegaView {
   }
 
   resize() {
-    if (this._useResize && this._view && this.updateVegaSize(this._view)) {
+    if (this._specParams.useResize && this._view && this.updateVegaSize(this._view)) {
       return this._view.runAsync();
     } else {
       return Promise.resolve();
@@ -76,8 +70,10 @@ export class VegaView {
   }
 
   updateVegaSize(view) {
-    const width = Math.max(0, this._$container.width() - this._paddingWidth);
-    const height = Math.max(0, this._$container.height() - this._paddingHeight);
+    // FIXME: for some reason the object is slightly scrollable without this
+    const heightExtraPadding = 6;
+    const width = Math.max(0, this._$container.width() - this._specParams.paddingWidth);
+    const height = Math.max(0, this._$container.height() - this._specParams.paddingHeight) - heightExtraPadding;
     if (view.width() !== width || view.height() !== height) {
       view.width(width).height(height);
       return true;
@@ -86,13 +82,13 @@ export class VegaView {
   }
 
   async _initRawVega() {
-    const view = new vega.View(vega.parse(this._spec), this._viewConfig);
+    const view = new vega.View(vega.parse(this._specParams.spec), this._viewConfig);
     view.warn = this._onWarn;
     view.error = this._onError;
-    if (this._useResize) this.updateVegaSize(view);
+    if (this._specParams.useResize) this.updateVegaSize(view);
     view.initialize(this._$container.get(0), this._$controls.get(0));
 
-    if (this._useHover) view.hover();
+    if (this._specParams.useHover) view.hover();
 
     this._addDestroyHandler(() => {
       this._view = null;
@@ -109,16 +105,11 @@ export class VegaView {
     const url = tmsService.getUrl();
     const options = tmsService.getTMSOptions();
 
-    const delayRepaint = this._mapConfig.delayRepaint === undefined ? true : this._mapConfig.delayRepaint;
-    const lon = this._mapConfig.longitude || 0;
-    const lat = this._mapConfig.latitude || 0;
-    const zoom = this._mapConfig.zoom === undefined ? 2 : this._mapConfig.zoom;
-
     const map = L.map(this._$container.get(0), {
       minZoom: options.minZoom,
       maxZoom: options.maxZoom,
-      center: [lat, lon],
-      zoom: Math.min(options.maxZoom, Math.max(options.minZoom, zoom))
+      center: [this._specParams.latitude, this._specParams.longitude],
+      zoom: Math.min(options.maxZoom, Math.max(options.minZoom, this._specParams.zoom))
     });
 
     const baseLayer = L
@@ -131,10 +122,10 @@ export class VegaView {
       .addTo(map);
 
     const vegaLayer = L
-      .vega(this._spec, {
+      .vega(this._specParams.spec, {
         vega,
         bindingsContainer: this._$controls.get(0),
-        delayRepaint,
+        delayRepaint: this._specParams.delayRepaint,
         viewConfig: this._viewConfig,
         onWarning: this._onWarn,
         onError: this._onError

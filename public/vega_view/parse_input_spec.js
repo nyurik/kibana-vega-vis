@@ -34,16 +34,36 @@ export function parseInputSpec(inputSpec, onWarning) {
     );
   }
 
-  const mapConfig = spec._map;
-  if (mapConfig) {
-    delete spec._map;
+  const hostConfig = spec._hostConfig;
+  if (hostConfig !== undefined) {
+    delete spec.hostConfig;
+    if (typeof hostConfig !== 'object') {
+      throw new Error('_hostConfig must be an object');
+    }
+  }
+
+  const useMap = !!(hostConfig && hostConfig.type === 'map');
+  let delayRepaint = hostConfig && hostConfig.delayRepaint;
+  let latitude = hostConfig && hostConfig.latitude;
+  let longitude = hostConfig && hostConfig.longitude;
+  let zoom = hostConfig && hostConfig.zoom;
+
+  if (!useMap && (latitude !== undefined || longitude !== undefined || zoom !== undefined || delayRepaint !== undefined)) {
+    throw new Error('_hostConfig must have type="map" when used with latitude/longitude/zoom parameters');
+  }
+
+  if (useMap) {
+    longitude = longitude || 0;
+    latitude = latitude || 0;
+    zoom = zoom === undefined ? 2 : zoom;
+    delayRepaint = delayRepaint === undefined ? true : delayRepaint;
   }
 
   // preserve autosize before Vega-Lite compiler
   const autosize = spec.autosize;
 
   if (isVegaLite) {
-    if (mapConfig) {
+    if (useMap) {
       throw new Error('"_map" configuration is not compatible with vega-lite spec');
     }
 
@@ -51,11 +71,12 @@ export function parseInputSpec(inputSpec, onWarning) {
   }
 
   // Default autosize should be fit, unless it's a map (leaflet-vega handles that)
-  if (autosize === undefined && !mapConfig) {
+  if (autosize === undefined && !useMap) {
     spec.autosize = 'fit';
   }
 
-  const useResize = !isVegaLite && !mapConfig && spec.autosize === 'fit';
+  const useResize = !isVegaLite && !useMap && spec.autosize === 'fit';
+  const useHover = !isVegaLite;
 
   // Padding is not included in the width/height (unless a new autosize mode is introduced)
   let paddingWidth = 0;
@@ -71,9 +92,8 @@ export function parseInputSpec(inputSpec, onWarning) {
   }
 
   if (useResize && (spec.width || spec.height)) {
-    onWarning('The "width" and "height" params will be ignored ');
+    onWarning('The \'width\' and \'height\' params are ignored with autosize=fit');
   }
 
-  return {
-    spec, paddingWidth, paddingHeight, mapConfig, useResize, useHover: !isVegaLite };
+  return { spec, paddingWidth, paddingHeight, useMap, latitude, longitude, zoom, delayRepaint, useResize, useHover };
 }
