@@ -1,6 +1,7 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v3.0.0-alpha.json",
-  "_map": {
+  "_hostConfig": {
+    "type": "map",
     "delayRepaint": false,
     "latitude": 52,
     "longitude": 0,
