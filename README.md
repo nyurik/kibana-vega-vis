@@ -7,7 +7,7 @@
 * Add this plugin to Kibana.
 * In Kibana, choose Visualize, and add Vega visualization.
 * Copy this Vega-Lite into the left panel. You should immediatelly see the graph.
-```json
+```yaml
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
   "description": "A simple bar chart with embedded data.",
@@ -33,7 +33,7 @@
 # Vega with a map
 Kibana's default map can be used as a base of the Vega graph. To enable, the graph must specify `type=map` in the host configuration:
 
-```json
+```yaml
 {
   "_hostConfig": {
     "type": "map",
@@ -59,7 +59,7 @@ This plugin will automatically inject a projection called `"projection"`. Use it
 When using [Vega](https://vega.github.io/vega/examples/) and [Vega Lite](https://vega.github.io/vega-lite/examples/) examples, you may need to modify the "data" section to use absolute URL. For example, replace `"url": "data/world-110m.json"` with `"url": "https://vega.github.io/editor/data/world-110m.json"`. Also, regular Vega (not Vega-lite) examples use `"autosize": "pad"` layout model, whereas Kibana plugin uses `fit`. See [sizing and positioning](#Sizing and positioning) below.
 
 ### Additional configuration options
-```json
+```yaml
 {
   "_hostConfig": {
     // Placement of the Vega-defined signal bindings.
