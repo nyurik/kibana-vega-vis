@@ -5,7 +5,9 @@
     "delayRepaint": false,
     "latitude": 41,
     "longitude": -74,
-    "zoom": 4
+    "zoom": 4,
+    "controlsLocation": "top",
+    "controlsDirection": "horizontal"
   },
   "signals": [
     {
