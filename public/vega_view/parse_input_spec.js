@@ -59,9 +59,6 @@ export function parseInputSpec(inputSpec, onWarning) {
     delayRepaint = delayRepaint === undefined ? true : delayRepaint;
   }
 
-  // preserve autosize before Vega-Lite compiler
-  const autosize = spec.autosize;
-
   if (isVegaLite) {
     if (useMap) {
       throw new Error('"_map" configuration is not compatible with vega-lite spec');
@@ -71,7 +68,7 @@ export function parseInputSpec(inputSpec, onWarning) {
   }
 
   // Default autosize should be fit, unless it's a map (leaflet-vega handles that)
-  if (autosize === undefined && !useMap) {
+  if (spec.autosize === undefined && !useMap) {
     spec.autosize = 'fit';
   }
 
