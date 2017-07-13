@@ -1,12 +1,12 @@
 # vega_vis
 
-> Build [Vega](https://vega.github.io/vega/examples/) and [Vega Lite](https://vega.github.io/vega-lite/examples/) visualizations into Kibana, either standalone, or on top of a map.
+> Build [Vega](https://vega.github.io/vega/examples/) and [VegaLite](https://vega.github.io/vega-lite/examples/) data visualizations into Kibana, either standalone, or on top of a map.
 
 # Quick Demo
 
 * Add this plugin to Kibana.
 * In Kibana, choose Visualize, and add Vega visualization.
-* Copy this Vega-Lite into the left panel. You should immediatelly see the graph.
+* Copy this VegaLite into the left panel. You should immediatelly see the graph.
 ```yaml
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
@@ -27,8 +27,8 @@
 }
 ```
 * Try changing `mark` from `bar` to `point`, `line`, `area`, `circle`, `square`, ... (see [docs](https://vega.github.io/vega-lite/docs/mark.html#mark-def))
-* Try other [Vega](https://vega.github.io/vega/examples/) or [Vega Lite](https://vega.github.io/vega-lite/examples/) visualizations (see notes below)
-* Try a [map example](examples/map.simple.json)
+* Try other [Vega](https://vega.github.io/vega/examples/) or [VegaLite](https://vega.github.io/vega-lite/examples/) visualizations (see notes below)
+* Try a [map example](public/examples/map.simple.json)
 
 # Vega with a map
 Kibana's default map can be used as a base of the Vega graph. To enable, the graph must specify `type=map` in the host configuration:
@@ -132,10 +132,18 @@ As a result, "myEsDataSource" will be a list of objects. Note that `"key"` is a 
 ]
 ```
 
+# Vega vs VegaLite
+VegaLite is a simplified version of Vega, useful to quickly get started, but has a number of limitations.  VegaLite is automatically converted into Vega before rendering. Compare [logstash-simple_line-vega](public/examples/logstash-simple_line-vega.json) and [logstash-simple_line-vegalite](public/examples/logstash-simple_line-vegalite.json) (both use the same ElasticSearch logstash data). You may use [this editor](https://vega.github.io/editor/) to convert VegaLite into Vega.  
+
 # Notes
 
-### Using Vega and Vega-lite examples
-When using [Vega](https://vega.github.io/vega/examples/) and [Vega Lite](https://vega.github.io/vega-lite/examples/) examples, you may need to modify the "data" section to use absolute URL. For example, replace `"url": "data/world-110m.json"` with `"url": "https://vega.github.io/editor/data/world-110m.json"`. Also, regular Vega (not Vega-lite) examples use `"autosize": "pad"` layout model, whereas Kibana plugin uses `fit`. See [sizing and positioning](#Sizing and positioning) below.
+### Useful Links
+* [Editor](https://vega.github.io/editor/) - includes examples for Vega & VegaLite, but does not support any Kibana-Plugin-specific features like ElasticSearch requests and interactive base maps.
+* VegaLite [Tutorials](https://vega.github.io/vega-lite/tutorials/getting_started.html), [docs](https://vega.github.io/vega-lite/docs/), and [examples](https://vega.github.io/vega-lite/examples/)
+* Vega [Tutorial](https://vega.github.io/vega/tutorials/), [docs](https://vega.github.io/vega/docs/), [examples](https://vega.github.io/vega/examples/)
+
+### Using Vega and VegaLite examples
+When using [Vega](https://vega.github.io/vega/examples/) and [VegaLite](https://vega.github.io/vega-lite/examples/) examples, you may need to modify the "data" section to use absolute URL. For example, replace `"url": "data/world-110m.json"` with `"url": "https://vega.github.io/editor/data/world-110m.json"`. Also, regular Vega (not VegaLite) examples use `"autosize": "pad"` layout model, whereas Kibana plugin uses `fit`. See [sizing and positioning](#Sizing and positioning) below.
 
 ### Additional configuration options
 ```yaml
@@ -151,7 +159,6 @@ When using [Vega](https://vega.github.io/vega/examples/) and [Vega Lite](https:/
 }
 ```
 
-
 ### Sizing and positioning
 ##### Vega
 By default, Kibana Vega graphs will use `autosize="fit"` layout model for Vega graphs, use all available space, and ignore `width` and `height` values. You may override this behaviour by specifying a different `autosize` value.
@@ -159,13 +166,11 @@ By default, Kibana Vega graphs will use `autosize="fit"` layout model for Vega g
 ##### Vega on a map
 All Vega graphs will ignore `autosize`, `width`, `height`, and `padding` values, using `fit` model with zero padding.
 
-##### Vega-Lite
-Vega lite [does not support](https://github.com/vega/vega-lite/issues/618) flexible resizing. By default, the graph will be at least 200x200 plus padding and additional elements like the legend and axes.
+##### VegaLite
+VegaLite [does not support](https://github.com/vega/vega-lite/issues/618) flexible resizing. By default, the graph will be at least 200x200 plus padding and additional elements like the legend and axes.
 
 
----
-
-## development
+## Development
 
 See the [kibana contributing guide](https://github.com/elastic/kibana/blob/master/CONTRIBUTING.md) for instructions setting up your development environment. Once you have completed that, use the following npm tasks.
 
