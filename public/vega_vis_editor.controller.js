@@ -10,7 +10,9 @@ export function createVegaVisEditorController(getAppState) {
 
       split([$el.find('.vegaEditor').get(0), $el.find('.vegaEditorPreview').get(0)], {
         sizes: [40, 60],
-        minSize: [200, 200]
+        minSize: [200, 200],
+        elementStyle: (dim, size, gutterSize) => ({ 'flex-basis': 'calc(' + size + '% - ' + gutterSize + 'px)' }),
+        gutterStyle: (dim, gutterSize) => ({ 'flex-basis': gutterSize + 'px' })
       });
 
       $scope.$watchMulti(
