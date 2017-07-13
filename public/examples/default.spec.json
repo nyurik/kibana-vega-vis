@@ -1,6 +1,9 @@
 {
-  "$schema": "https://vega.github.io/schema/vega-lite/v2.0.0-alpha.json",
+  "$schema": "https://vega.github.io/schema/vega-lite/v2.0.json",
   "description": "A simple bar chart with embedded data.",
+  "width": 500,
+  "height": 300,
+  "padding": 20,
   "data": {
     "values": [
       {"a": "A","b": 28}, {"a": "B","b": 55}, {"a": "C","b": 43},
