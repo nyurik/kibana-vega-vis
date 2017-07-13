@@ -1,11 +1,18 @@
 import chrome from 'ui/chrome';
 import hjson from 'hjson';
 import compactStringify from 'json-stringify-pretty-compact';
+import split from 'split.js';
 
 export function createVegaVisEditorController(getAppState) {
 
   class VegaVisEditorController {
-    link($scope, /*$el, $attr*/) {
+    link($scope, $el /*, $attr*/) {
+
+      split([$el.find('.vegaEditor').get(0), $el.find('.vegaEditorPreview').get(0)], {
+        sizes: [40, 60],
+        minSize: [200, 200]
+      });
+
       $scope.$watchMulti(
         ['=vegaEditor.vis.params'],
         () => getAppState().save(true)

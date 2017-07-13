@@ -52,6 +52,85 @@ Kibana's default map can be used as a base of the Vega graph. To enable, the gra
 
 This plugin will automatically inject a projection called `"projection"`. Use it to calculate positioning of all geo-aware marks. Additionally, you may use `latitude`, `longitude`, and `zoom` signals. These signals can be used in the graph, or can be updated to modify the positioning of the map.
 
+# Querying ElasticSearch
+By default, Vega's [data](https://vega.github.io/vega/docs/data/) element can use embedded and external data with a `"url"` parameter. Kibana plugin adds support for the direct ElasticSearch queries by overloading the "url"` value.
+
+Here is an example of an ES query that creates two 
+  
+```yaml
+{
+  "data": [
+    {
+      "name": "myEsDataSource",
+      "url": {
+        // Index name
+        "index": "logstash-*",
+        
+        // Query request - can be copied from the debug view of another visualizer
+        // You can try this query in Kibana Dev tools (hardcode or remove the %timefilter% first)
+        "body": {
+          "query": {
+            "range": {
+              "@timestamp": {
+                // "%timefilter%" will be replaced with the current
+                // values of the time filter (from the upper right corner)
+                "%timefilter%": true
+                
+                // Only work with %timefilter%
+                // Shift the current timefilter by...
+                "shift": 10,
+                "unit": "minute" // supports week, day, hour, minute, second
+              }
+            }
+          },
+
+          // When aggegating, do not return individual documents that match the query 
+          "size": 0,
+          
+          // Data aggegation...
+          "aggs": {
+            // Name of the aggegation - your Vega graph will use it to parse the results
+            "hist": {
+              "date_histogram": {
+                "field": "@timestamp",
+                "interval": "2h",
+                "time_zone": "America/New_York",
+                "min_doc_count": 1
+              }
+            }
+          }
+        }
+      },
+    
+      // This is a useful trick to access just the list of aggregation results named "hist"
+      // 
+      "format": {
+        "type": "json",
+        "property": "aggregations.hist.buckets"
+      },
+
+    }
+  ],
+  ...
+}
+```
+
+As a result, "myEsDataSource" will be a list of objects. Note that `"key"` is a unix timestamp, and can be used without conversions by the Vega date expressions.
+```yaml
+[
+    {
+      "key_as_string": "2017-06-13T04:00:00.000-04:00",
+      "key": 1497340800000,
+      "doc_count": 6
+    },
+    {
+      "key_as_string": "2017-06-13T06:00:00.000-04:00",
+      "key": 1497348000000,
+      "doc_count": 14
+    },
+    ...
+]
+```
 
 # Notes
 

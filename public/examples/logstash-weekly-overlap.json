@@ -1,12 +1,30 @@
 {
-  "$schema": "https://vega.github.io/schema/vega/v3.0.0-alpha.json",
-  "width": 700,
-  "height": 200,
-  "padding": 5,
-  "autosize": "fit",
+  "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+  "desrciption": "Show logstash data as weekly overlapping lines, thickest/brightest being the most recent",
   "signals": [
     {"name": "divider", "update": "(1000*60*60*24*7)"},
-    {"name": "interpolate", "value": "natural"}
+    {
+      "name": "interpolate",
+      "value": "natural",
+      "bind": {
+        "input": "select",
+        "options": [
+          "linear",
+          "linear-closed",
+          "step",
+          "step-before",
+          "step-after",
+          "basis",
+          "basis-open",
+          "basis-closed",
+          "cardinal",
+          "cardinal-open",
+          "cardinal-closed",
+          "bundle",
+          "monotone"
+        ]
+      }
+    }
   ],
   "data": [
     {
@@ -14,7 +32,10 @@
       "url": {
         "index": "logstash-*",
         "body": {
-          "query": {"range": {"@timestamp": {"%timefilter%": true}}},
+          "size": 0,
+          "query": {
+            "range": {"@timestamp": {"%timefilter%": true}}
+          },
           "aggs": {
             "hist": {
               "date_histogram": {
@@ -28,9 +49,16 @@
           "docvalue_fields": ["utc_time", "@timestamp"]
         }
       },
-      "format": {"type": "json", "property": "aggregations.hist.buckets"},
+      "format": {
+        "type": "json",
+        "property": "aggregations.hist.buckets"
+      },
       "transform": [
-        {"type": "formula", "as": "weekadjusted", "expr": "datum.key"},
+        {
+          "type": "formula",
+          "as": "weekadjusted",
+          "expr": "datum.key"
+        },
         {
           "type": "formula",
           "as": "week",
@@ -41,7 +69,10 @@
           "as": "weekday",
           "expr": "datum.weekadjusted%divider"
         },
-        {"type": "collect", "sort": {"field": ["week", "weekday"]}}
+        {
+          "type": "collect",
+          "sort": {"field": ["week", "weekday"]}
+        }
       ]
     }
   ],
@@ -84,7 +115,9 @@
       "tickCount": 7,
       "encode": {
         "labels": {
-          "update": {"text": {"signal": "utcFormat(datum.value, '%A')"}}
+          "update": {
+            "text": {"signal": "utcFormat(datum.value, '%A')"}
+          }
         }
       }
     },
@@ -93,7 +126,13 @@
   "marks": [
     {
       "type": "group",
-      "from": {"facet": {"name": "series", "data": "table", "groupby": "week"}},
+      "from": {
+        "facet": {
+          "name": "series",
+          "data": "table",
+          "groupby": "week"
+        }
+      },
       "marks": [
         {
           "type": "line",
@@ -104,7 +143,10 @@
               "y": {"scale": "yscale", "field": "doc_count"},
               "stroke": {"scale": "color", "field": "week"},
               "opacity": {"scale": "opac", "field": "week"},
-              "strokeWidth": {"scale": "thickness", "field": "week"}
+              "strokeWidth": {
+                "scale": "thickness",
+                "field": "week"
+              }
             },
             "update": {
               "interpolate": {"signal": "interpolate"},

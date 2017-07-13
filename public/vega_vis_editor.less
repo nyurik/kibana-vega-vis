@@ -1,14 +1,16 @@
 vega-vis-editor {
+  display: flex;
   flex: 1 1 auto;
   flex-direction: row;
-  display: flex;
+
   .vegaEditor {
-    flex: 0 0 40%;
+    // this is overriden by flex: 0 0 auto; defined for .collapsible-sidebar
+    //flex: 2 2 auto;
+    flex-basis: 50%;
     flex-direction: column;
-    display: flex;
-    // REVIEW!
+
     .vegaEditorToolbar {
-      flex: 0 0 1px;
+      flex: 0 0 content;
       // FIXME!
       background-color: #adadad;
       padding: 0.3em 1em;
@@ -16,15 +18,28 @@ vega-vis-editor {
         margin-left: 0.4em;
       }
     }
+
     .vegaEditorSpec {
-      flex: 1 1 1px;
+      flex: 1 1 auto;
     }
   }
+
+  .gutter {
+    flex: 0 0 13px;
+    cursor: ew-resize;
+    background-color: #e4e4e4;
+    align-items: center;
+
+    &:hover {
+      background-color: darken(#e4e4e4, 10%);
+    }
+
+    &.active {
+      background-color: darken(#e4e4e4, 40%);;
+    }
+  }
+
   .vegaEditorPreview {
-    flex: 1 1 1px;
+    flex: 1 1 50%;
   }
 }
-
-//filter-bar {
-//  display: none;
-//}
