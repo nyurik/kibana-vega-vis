@@ -1,16 +1,16 @@
-<div class="vegaEditor collapsible-sidebar">
+<div class="col-md-5 sidebar-container collapsible-sidebar vegaEditor" style="margin-right: 0;">
   <div class="vegaEditorToolbar">
     <span>Reformat as:</span>
     <button
       ng-click="vegaEditor.formatHJson()"
-      tooltip="Format with HJSON rules"
+      tooltip="Format graph code as HJSON"
       class="kuiButton kuiButton--basic"
     >
       <span>HJSON</span>
     </button>
     <button
       ng-click="vegaEditor.formatJson()"
-      tooltip="Format with JSON rules"
+      tooltip="Format graph code as JSON"
       class="kuiButton kuiButton--basic"
     >
       <span>JSON</span>
@@ -31,6 +31,7 @@
     ng-model="vegaEditor.vis.params.spec"
   ></div>
 </div>
+
 <div class="vegaEditorPreview">
   <visualize
     vis="vegaEditor.vis"

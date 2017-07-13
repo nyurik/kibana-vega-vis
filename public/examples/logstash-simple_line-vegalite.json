@@ -1,0 +1,36 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
+  "width": 800,
+  "height": 600,
+  "data": {
+    "name": "table",
+    "url": {
+      "index": "logstash-*",
+      "body": {
+        "query": {
+          "range": {"@timestamp": {"%timefilter%": true}}
+        },
+        "size": 0,
+        "aggs": {
+          "hist": {
+            "date_histogram": {
+              "field": "@timestamp",
+              "interval": "2h",
+              "time_zone": "America/New_York",
+              "min_doc_count": 1
+            }
+          }
+        }
+      }
+    },
+    "format": {
+      "type": "json",
+      "property": "aggregations.hist.buckets"
+    }
+  },
+  "mark": "line",
+  "encoding": {
+    "x": {"field": "key", "type": "temporal"},
+    "y": {"field": "doc_count", "type": "quantitative"}
+  }
+}

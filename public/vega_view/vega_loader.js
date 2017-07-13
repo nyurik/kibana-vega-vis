@@ -30,22 +30,27 @@ export function createVegaLoader(es, timefilter) {
           let multiplier;
           switch (unit) {
             case 'w':
+            case 'week':
               multiplier = 1000 * 60 * 60 * 24 * 7;
               break;
             case 'd':
+            case 'day':
               multiplier = 1000 * 60 * 60 * 24;
               break;
             case 'h':
+            case 'hour':
               multiplier = 1000 * 60 * 60;
               break;
             case 'm':
+            case 'minute':
               multiplier = 1000 * 60;
               break;
             case 's':
+            case 'second':
               multiplier = 1000;
               break;
             default:
-              throw new Error('Unknown unit value. Must be one of w,d,h,m,s');
+              throw new Error('Unknown unit value. Must be one of: [week, day, hour, minute, second]');
           }
           obj.gte += shift * multiplier;
           obj.lte += shift * multiplier;

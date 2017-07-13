@@ -21,7 +21,7 @@ VisTypesRegistryProvider.register(function MetricVisProvider(Private) {
     title: 'Vega Vis',
     description: '',
     icon: 'fa-code',
-    template: `<vega-vis vis="vis" es-response="esResponse"></vega-vis>`,
+    template: `<vega-vis vis="vis"></vega-vis>`,
     params: {
       defaults: {
         spec: defaultSpec
@@ -33,7 +33,7 @@ ui-state="uiState"
 ></vega-vis-editor>`
     },
     // implementsRenderComplete: true,
-    requiresSearch: true,
+    // requiresSearch: true,
     requiresTimePicker: true,
     fullEditor: true,
     category: VisType.CATEGORY.OTHER
