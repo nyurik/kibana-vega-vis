@@ -95,16 +95,16 @@ export function parseInputSpec(inputSpec, onWarning) {
 
   // Default autosize should be fit, unless it's a map (leaflet-vega handles that)
   if (spec.autosize === undefined && !useMap) {
-    spec.autosize = 'fit';
+    spec.autosize = { type: 'fit', contains: 'padding' };
   }
 
-  const useResize = !isVegaLite && !useMap && spec.autosize === 'fit';
+  const useResize = !isVegaLite && !useMap && (spec.autosize === 'fit' || spec.autosize.type === 'fit');
   const useHover = !isVegaLite;
 
-  // Padding is not included in the width/height (unless a new autosize mode is introduced)
+  // Padding is not included in the width/height by default
   let paddingWidth = 0;
   let paddingHeight = 0;
-  if (useResize && spec.padding) {
+  if (useResize && spec.padding && spec.autosize.contains !== 'padding') {
     if (typeof spec.padding === 'object') {
       paddingWidth += (+spec.padding.left || 0) + (+spec.padding.right || 0);
       paddingHeight += (+spec.padding.top || 0) + (+spec.padding.bottom || 0);
