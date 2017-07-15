@@ -22,10 +22,12 @@ export function parseInputSpec(inputSpec, onWarning) {
 
   // FIXME TODO:   remove this switch statement once Vega 3.0 & Vega-lite 2.0 is released
   switch (spec.$schema) {
+    case 'https://vega.github.io/schema/vega/v3.json':
     case 'https://vega.github.io/schema/vega/v3.0.json':
       spec.$schema = 'https://vega.github.io/schema/vega/v3.0.0-beta.json';
       break;
     case 'https://vega.github.io/schema/vega-lite/v2.json':
+    case 'https://vega.github.io/schema/vega-lite/v2.0.json':
       spec.$schema = 'https://vega.github.io/schema/vega-lite/v2.0.0-beta.json';
       break;
   }
