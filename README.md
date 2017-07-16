@@ -28,7 +28,7 @@
 ```
 * Try changing `mark` from `bar` to `point`, `line`, `area`, `circle`, `square`, ... (see [docs](https://vega.github.io/vega-lite/docs/mark.html#mark-def))
 * Try other [Vega](https://vega.github.io/vega/examples/) or [VegaLite](https://vega.github.io/vega-lite/examples/) visualizations (see notes below)
-* Try a [map example](public/examples/map.simple.json)
+* Try a [map example](public/examples/external_and_embedded_data/map_unemployment_data.json)
 
 # Vega with a map
 Kibana's default map can be used as a base of the Vega graph. To enable, the graph must specify `type=map` in the host configuration:
@@ -37,7 +37,7 @@ Kibana's default map can be used as a base of the Vega graph. To enable, the gra
 {
   "_hostConfig": {
     "type": "map",
-    
+
     // Initial map position
     "latitude": 40.7,     // default 0
     "longitude": -74,     // default 0
@@ -55,8 +55,8 @@ This plugin will automatically inject a projection called `"projection"`. Use it
 # Querying ElasticSearch
 By default, Vega's [data](https://vega.github.io/vega/docs/data/) element can use embedded and external data with a `"url"` parameter. Kibana plugin adds support for the direct ElasticSearch queries by overloading the "url"` value.
 
-Here is an example of an ES query that creates two 
-  
+Here is an example of an ES query that creates two
+
 ```yaml
 {
   "data": [
@@ -65,7 +65,7 @@ Here is an example of an ES query that creates two
       "url": {
         // Index name
         "index": "logstash-*",
-        
+
         // Query request - can be copied from the debug view of another visualizer
         // You can try this query in Kibana Dev tools (hardcode or remove the %timefilter% first)
         "body": {
@@ -75,7 +75,7 @@ Here is an example of an ES query that creates two
                 // "%timefilter%" will be replaced with the current
                 // values of the time filter (from the upper right corner)
                 "%timefilter%": true
-                
+
                 // Only work with %timefilter%
                 // Shift the current timefilter by...
                 "shift": 10,
@@ -84,9 +84,9 @@ Here is an example of an ES query that creates two
             }
           },
 
-          // When aggegating, do not return individual documents that match the query 
+          // When aggegating, do not return individual documents that match the query
           "size": 0,
-          
+
           // Data aggegation...
           "aggs": {
             // Name of the aggegation - your Vega graph will use it to parse the results
@@ -101,9 +101,9 @@ Here is an example of an ES query that creates two
           }
         }
       },
-    
+
       // This is a useful trick to access just the list of aggregation results named "hist"
-      // 
+      //
       "format": {
         "type": "json",
         "property": "aggregations.hist.buckets"
@@ -133,7 +133,7 @@ As a result, "myEsDataSource" will be a list of objects. Note that `"key"` is a 
 ```
 
 # Vega vs VegaLite
-VegaLite is a simplified version of Vega, useful to quickly get started, but has a number of limitations.  VegaLite is automatically converted into Vega before rendering. Compare [logstash-simple_line-vega](public/examples/logstash-simple_line-vega.json) and [logstash-simple_line-vegalite](public/examples/logstash-simple_line-vegalite.json) (both use the same ElasticSearch logstash data). You may use [this editor](https://vega.github.io/editor/) to convert VegaLite into Vega.  
+VegaLite is a simplified version of Vega, useful to quickly get started, but has a number of limitations.  VegaLite is automatically converted into Vega before rendering. Compare [logstash-simple_line-vega](public/examples/logstash/logstash-simple_line-vega.json) and [logstash-simple_line-vegalite](public/examples/logstash/logstash-simple_line-vegalite.json) (both use the same ElasticSearch logstash data). You may use [this editor](https://vega.github.io/editor/) to convert VegaLite into Vega.
 
 # Notes
 
@@ -162,7 +162,7 @@ When using [Vega](https://vega.github.io/vega/examples/) and [VegaLite](https://
 ### Sizing and positioning
 ##### Vega
 By default, Kibana Vega graphs will use `autosize="fit"` layout model for Vega graphs, use all available space, and ignore `width` and `height` values. You may override this behaviour by specifying a different `autosize` value.
- 
+
 ##### Vega on a map
 All Vega graphs will ignore `autosize`, `width`, `height`, and `padding` values, using `fit` model with zero padding.
 

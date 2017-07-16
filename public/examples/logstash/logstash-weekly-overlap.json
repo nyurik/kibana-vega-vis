@@ -1,6 +1,6 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v3.0.json",
-  "desrciption": "Show logstash data as weekly overlapping lines, thickest/brightest being the most recent",
+  "desrciption": "Show logstash data as weekly overlapping lines, thickest/brightest being the most recent. Make sure your timefilter range has data.",
   "signals": [
     {"name": "divider", "update": "(1000*60*60*24*7)"},
     {
@@ -32,10 +32,10 @@
       "url": {
         "index": "logstash-*",
         "body": {
-          "size": 0,
           "query": {
             "range": {"@timestamp": {"%timefilter%": true}}
           },
+          "size": 0,
           "aggs": {
             "hist": {
               "date_histogram": {
@@ -45,8 +45,7 @@
                 "min_doc_count": 1
               }
             }
-          },
-          "docvalue_fields": ["utc_time", "@timestamp"]
+          }
         }
       },
       "format": {
