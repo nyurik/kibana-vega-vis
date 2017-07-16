@@ -1,8 +1,7 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v3.0.json",
-  "width": 700,
-  "height": 200,
-  "padding": 5,
+  "description": "Show ",
+  "padding": 20,
   "autosize": "fit",
   "data": [
     {
@@ -10,7 +9,9 @@
       "url": {
         "index": "logstash-*",
         "body": {
-          "query": {"range": {"@timestamp": {"%timefilter%": true}}},
+          "query": {
+            "range": {"@timestamp": {"%timefilter%": true}}
+          },
           "size": 0,
           "aggs": {
             "hist": {
@@ -21,8 +22,7 @@
                 "min_doc_count": 1
               }
             }
-          },
-          "docvalue_fields": ["utc_time","@timestamp"]
+          }
         }
       },
       "format": {
@@ -35,19 +35,19 @@
     {
       "name": "xscale",
       "type": "time",
-      "domain": {"data": "table","field": "key"},
+      "domain": {"data": "table", "field": "key"},
       "range": "width"
     },
     {
       "name": "yscale",
-      "domain": {"data": "table","field": "doc_count"},
+      "domain": {"data": "table", "field": "doc_count"},
       "nice": true,
       "range": "height"
     }
   ],
   "axes": [
-    {"orient": "bottom","scale": "xscale","tickCount": 7},
-    {"orient": "left","scale": "yscale"}
+    {"orient": "bottom", "scale": "xscale", "tickCount": 7},
+    {"orient": "left", "scale": "yscale"}
   ],
   "marks": [
     {
@@ -56,8 +56,8 @@
       "from": {"data": "table"},
       "encode": {
         "enter": {
-          "x": {"scale": "xscale","field": "key"},
-          "y": {"scale": "yscale","field": "doc_count"},
+          "x": {"scale": "xscale", "field": "key"},
+          "y": {"scale": "yscale", "field": "doc_count"},
           "stroke": {"value": "#35B"},
           "strokeWidth": {"value": 3}
         }
