@@ -2,6 +2,9 @@
 
 > Build [Vega](https://vega.github.io/vega/examples/) and [VegaLite](https://vega.github.io/vega-lite/examples/) data visualizations into Kibana, either standalone, or on top of a map.
 
+[![Leaflet Vega layer demo](https://i.ytimg.com/vi_webp/lQGCipY3th8/maxresdefault.webp)](https://www.youtube.com/watch?v=SBzDVXWdJWQ)
+
+
 # Quick Demo
 
 * Follow Kibana plugin installation [instructions](https://www.elastic.co/guide/en/kibana/current/_installing_plugins.html). For URL, use a direct download link from the [releases page](https://github.com/nyurik/kibana-vega-vis/releases)
