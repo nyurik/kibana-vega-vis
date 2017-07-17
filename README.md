@@ -1,4 +1,4 @@
-# vega_vis
+# Vega visualization plugin for Kibana
 
 > Build [Vega](https://vega.github.io/vega/examples/) and [VegaLite](https://vega.github.io/vega-lite/examples/) data visualizations into Kibana, either standalone, or on top of a map.
 
