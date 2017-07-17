@@ -2,7 +2,7 @@
 
 > Build [Vega](https://vega.github.io/vega/examples/) and [VegaLite](https://vega.github.io/vega-lite/examples/) data visualizations into Kibana, either standalone, or on top of a map.
 
-# Short Video Intro
+# Watch a short introduction video
 [![Leaflet Vega layer demo](https://i.ytimg.com/vi_webp/lQGCipY3th8/maxresdefault.webp)](https://www.youtube.com/watch?v=SBzDVXWdJWQ)
 
 
