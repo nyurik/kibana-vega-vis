@@ -4,9 +4,11 @@ vega-vis-editor {
   flex-direction: row;
 
   .vegaEditor {
-    // this is overriden by flex: 0 0 auto; defined for .collapsible-sidebar
-    //flex: 2 2 auto;
+    // this would is overriden by .collapsible-sidebar:  flex: 0 0 auto
+    flex: 2 2 auto;
+
     flex-basis: 50%;
+    display: flex;
     flex-direction: column;
 
     .vegaEditorToolbar {

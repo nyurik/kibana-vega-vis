@@ -1,16 +1,17 @@
 {
   "name": "vega_vis",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Build vega visualizations into Kibana",
   "main": "index.js",
   "kibana": {
     "version": "kibana"
   },
-  "repository": "spalger/kibana-vega-vis",
+  "repository": "nyurik/kibana-vega-vis",
   "license": "Apache-2.0",
-  "author": "Spencer Alger <spencer.alger@elastic.co>",
   "contributors": [
-    "Yuri Astrakhan <YuriAstrakhan@gmail.com>"
+    "Spencer Alger <spencer.alger@elastic.co>",
+    "Yuri Astrakhan <YuriAstrakhan@gmail.com>",
+    "Nathan Reese <reese.nathan@gmail.com>"
   ],
   "keywords": [
     "kibana",
