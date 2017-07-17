@@ -181,10 +181,6 @@ See the [kibana contributing guide](https://github.com/elastic/kibana/blob/maste
 
     Start kibana and have it include this plugin
 
-  - `npm start -- --config kibana.yml`
-
-    You can pass any argument that you would normally send to `bin/kibana` by putting them after `--` when running `npm start`
-
   - `npm run build`
 
     Build a distributable archive
