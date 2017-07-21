@@ -1,7 +1,7 @@
 <!--TODO: add collapsible-sidebar class (doesn't work in 5.5 with the split.js) -->
 <div class="col-md-5 sidebar-container vegaEditor" style="margin-right: 0;">
   <div class="vegaEditorToolbar">
-    <span>Reformat as:</span>
+    <div>Reformat&nbsp;as:</div>
     <button
       ng-click="vegaEditor.formatHJson()"
       tooltip="Format graph code as HJSON"
@@ -16,6 +16,9 @@
     >
       <span>JSON</span>
     </button>
+    <div class="vegaEditorHelp">
+      <a target="_blank" href="https://github.com/nyurik/kibana-vega-vis#vega-visualization-plugin-for-kibana">help</a>
+    </div>
   </div>
   <div
     ui-ace="{

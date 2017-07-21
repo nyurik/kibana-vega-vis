@@ -12,12 +12,26 @@ vega-vis-editor {
     flex-direction: column;
 
     .vegaEditorToolbar {
-      flex: 0 0 content;
-      // FIXME!
+      flex: 0 0 auto;
+
+      display: flex;
+      flex-wrap: wrap;
       background-color: #adadad;
-      padding: 0.3em 1em;
+      padding: 0.3em 0.6em;
+
       button {
         margin-left: 0.4em;
+      }
+
+      .vegaEditorHelp {
+        flex: 1 1 auto;
+        margin-left: 0.6em;
+        text-align: right;
+      }
+
+      button, div {
+        padding-top: 4px;
+        padding-bottom: 5px;
       }
     }
 
