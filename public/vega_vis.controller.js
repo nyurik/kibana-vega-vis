@@ -10,9 +10,22 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
   const ResizeChecker = Private(ResizeCheckerProvider);
 
   class VegaVisController {
+
     messages = [];
-    onError = (error) => this.messages.push({ type: 'error', error });
-    onWarn = (warning) => this.messages.push({ type: 'warning', warning });
+
+    onError = (error) => {
+      if (!error) {
+        error = 'ERR';
+      } else if (error instanceof Error) {
+        if (console && console.log) console.log(error);
+        error = error.message;
+      }
+      this.messages.push({ type: 'error', data: error });
+    };
+
+    onWarn = (warning) => {
+      this.messages.push({ type: 'warning', data: warning });
+    };
 
     link($scope, $el/*, $attr*/) {
       const resizeChecker = new ResizeChecker($el);
