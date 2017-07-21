@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "compare-versions": "^3.0.1",
-    "hjson": "^3.0.1",
+    "hjson": "^3.1.0",
     "json-stringify-pretty-compact": "^1.0.4",
     "leaflet-vega": "^0.4.0",
     "semver": "^5.3.0",

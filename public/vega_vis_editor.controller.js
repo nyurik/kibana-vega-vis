@@ -34,7 +34,7 @@ export function createVegaVisEditorController(getAppState) {
     }
 
     formatHJson() {
-      this._format(hjson.stringify);
+      this._format(hjson.stringify, { condense: 65 });
     }
 
     _format(stringify, opts) {
