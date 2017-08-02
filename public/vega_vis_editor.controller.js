@@ -29,12 +29,22 @@ export function createVegaVisEditorController(getAppState) {
       return false;
     }
 
+    getCodeWidth() {
+      // TODO: make this dynamic, based on the width of the code window
+      return 65;
+    }
+
     formatJson() {
-      this._format(compactStringify, { maxLength: 65 });
+      this._format(compactStringify, {
+        maxLength: this.getCodeWidth()
+      });
     }
 
     formatHJson() {
-      this._format(hjson.stringify, { condense: 65 });
+      this._format(hjson.stringify, {
+        condense: this.getCodeWidth(),
+        bracesSameLine: true
+      });
     }
 
     _format(stringify, opts) {
