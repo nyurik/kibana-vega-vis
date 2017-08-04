@@ -1,5 +1,8 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+  "description": "Show ",
+  "padding": 20,
+  "autosize": "fit",
   "data": [
     {
       "name": "table",
@@ -7,7 +10,15 @@
         "index": "logstash-*",
         "body": {
           "query": {
-            "range": {"@timestamp": {"%timefilter%": true}}
+            "bool": {
+              "must": [
+                "%dashboard_context-must_clause%",
+                {"range": {"@timestamp": {"%timefilter%": true}}}
+              ],
+              "must_not": [
+                "%dashboard_context-must_not_clause%"
+              ]
+            }
           },
           "size": 0,
           "aggs": {

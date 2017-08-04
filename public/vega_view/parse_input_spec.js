@@ -13,7 +13,7 @@ const locToDirMap = {
 };
 
 export function parseInputSpec(inputSpec, onWarning) {
-  let spec = {...inputSpec};
+  let spec = { ...inputSpec };
 
   if (!spec.$schema) {
     onWarning(`The input spec does not specify a "$schema", defaulting to "${DEFAULT_SCHEMA}"`);

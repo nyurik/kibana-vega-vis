@@ -6,7 +6,7 @@ import { VisVisTypeProvider } from 'ui/vis/vis_type';
 import './vega_vis.directive';
 import './vega_vis_editor.directive';
 
-import defaultSpec from '!!raw-loader!./examples/default.spec.json';
+import defaultSpec from '!!raw-loader!./default.spec.json';
 
 // register the provider with the visTypes registry
 VisTypesRegistryProvider.register(function MetricVisProvider(Private) {

@@ -1,5 +1,6 @@
 import { ResizeCheckerProvider } from 'ui/resize_checker';
-import { Notifier } from 'ui/notify';
+// import { Notifier } from 'ui/notify';
+import { dashboardContextProvider } from 'plugins/kibana/dashboard/dashboard_context';
 
 import { VegaView } from './vega_view';
 // import moment from 'moment';
@@ -8,6 +9,7 @@ import hjson from 'hjson';
 
 export function createVegaVisController(Private, /*$scope,*/ timefilter, es, serviceSettings) {
   const ResizeChecker = Private(ResizeCheckerProvider);
+  const dashboardContext = Private(dashboardContextProvider);
 
   class VegaVisController {
 
@@ -31,7 +33,8 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
       const resizeChecker = new ResizeChecker($el);
 
       $scope.timefilter = timefilter;
-      $scope.$watchMulti(['=vega.vis.params', '=timefilter'], async () => {
+      $scope.dashboardContext = dashboardContext;
+      $scope.$watchMulti(['=vega.vis.params', '=timefilter', '=dashboardContext', '=vis.params.expression', '=vis.params.interval', '=vega.vis.params.expression', '=vega.vis.params.interval'], async () => {
         this.messages = [];
 
         // FIXME!!  need to debounce editor changes
@@ -41,7 +44,7 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
           if (this.vegaView) {
             await this.vegaView.destroy();
           }
-          this.vegaView = new VegaView($el, spec, timefilter, es, serviceSettings, this.onError, this.onWarn);
+          this.vegaView = new VegaView($el, spec, timefilter, dashboardContext, es, serviceSettings, this.onError, this.onWarn);
           await this.vegaView.init();
         } catch (error) {
           this.onError(error);

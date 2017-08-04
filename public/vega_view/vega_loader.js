@@ -1,67 +1,99 @@
 import * as vega from 'vega';
 
-export function createVegaLoader(es, timefilter) {
+export function createVegaLoader(es, timefilter, dashboardContext) {
+
+  const TIMEFILTER = '%timefilter%';
+  const MUST_CLAUSE = '%dashboard_context-must_clause%';
+  const MUST_NOT_CLAUSE = '%dashboard_context-must_not_clause%';
 
   function queryEsData(uri) {
-    injectTimeRange(uri);
+    injectContextVars(uri);
     return es.search(uri);
   }
 
-  function injectTimeRange(obj) {
+  function injectContextVars(obj) {
     if (obj && typeof obj === 'object') {
-      if (obj['%timefilter%']) {
-        delete obj['%timefilter%'];
-        const bounds = timefilter.getBounds();
-        obj.gte = bounds.min.valueOf();
-        obj.lte = bounds.max.valueOf();
-        obj.format = 'epoch_millis';
-
-        if (obj.shift) {
-          const shift = obj.shift;
-          if (typeof shift !== 'number') {
-            throw new Error('shift must be a numeric value');
+      if (Array.isArray(obj)) {
+        for (let pos = 0; pos < obj.length;) {
+          const item = obj[pos];
+          if (item === MUST_CLAUSE || item === MUST_NOT_CLAUSE) {
+            const ctxTag = item === MUST_CLAUSE ? 'must' : 'must_not';
+            const ctx = dashboardContext();
+            if (ctx && ctx.bool && ctx.bool[ctxTag]) {
+              obj.splice(pos, 1, ...ctx.bool[ctxTag]);  // replace items
+              pos += ctx.bool[ctxTag].length;
+            } else {
+              obj.splice(pos, 1); // remove item, keep pos at the same position
+            }
+          } else {
+            injectContextVars(item);
+            pos++;
           }
-          delete obj.shift;
-          let unit = 'd';
-          if (obj.unit) {
-            unit = obj.unit;
-            delete obj.unit;
-          }
-          let multiplier;
-          switch (unit) {
-            case 'w':
-            case 'week':
-              multiplier = 1000 * 60 * 60 * 24 * 7;
-              break;
-            case 'd':
-            case 'day':
-              multiplier = 1000 * 60 * 60 * 24;
-              break;
-            case 'h':
-            case 'hour':
-              multiplier = 1000 * 60 * 60;
-              break;
-            case 'm':
-            case 'minute':
-              multiplier = 1000 * 60;
-              break;
-            case 's':
-            case 'second':
-              multiplier = 1000;
-              break;
-            default:
-              throw new Error('Unknown unit value. Must be one of: [week, day, hour, minute, second]');
-          }
-          obj.gte += shift * multiplier;
-          obj.lte += shift * multiplier;
         }
-      } else {
+      } else if (!injectTimeFilter(obj)) {
         for (const prop in obj) {
           if (obj.hasOwnProperty(prop)) {
-            injectTimeRange(obj[prop]);
+            injectContextVars(obj[prop]);
           }
         }
       }
+    }
+  }
+
+  /**
+   * If obj contains `%timefilter%` key, remove it, and inject timefilter bounds with optional shift & unit parameters
+   * @param obj
+   * @return {boolean}
+   */
+  function injectTimeFilter(obj) {
+    if (!obj[TIMEFILTER]) return false;
+
+    delete obj[TIMEFILTER];
+    const bounds = timefilter.getBounds();
+    obj.gte = bounds.min.valueOf();
+    obj.lte = bounds.max.valueOf();
+    obj.format = 'epoch_millis';
+
+    if (obj.shift) {
+      const shift = obj.shift;
+      if (typeof shift !== 'number') {
+        throw new Error('shift must be a numeric value');
+      }
+      delete obj.shift;
+      let unit = 'd';
+      if (obj.unit) {
+        unit = obj.unit;
+        delete obj.unit;
+      }
+      let multiplier;
+      switch (unit) {
+        case 'w':
+        case 'week':
+          multiplier = 1000 * 60 * 60 * 24 * 7;
+          break;
+        case 'd':
+        case 'day':
+          multiplier = 1000 * 60 * 60 * 24;
+          break;
+        case 'h':
+        case 'hour':
+          multiplier = 1000 * 60 * 60;
+          break;
+        case 'm':
+        case 'minute':
+          multiplier = 1000 * 60;
+          break;
+        case 's':
+        case 'second':
+          multiplier = 1000;
+          break;
+        default:
+          throw new Error('Unknown unit value. Must be one of: [week, day, hour, minute, second]');
+      }
+      obj.gte += shift * multiplier;
+      obj.lte += shift * multiplier;
+
+      return true;
     }
   }
 
