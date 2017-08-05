@@ -8,7 +8,12 @@
 
 # Quick Demo
 
-* Follow Kibana plugin installation [instructions](https://www.elastic.co/guide/en/kibana/current/_installing_plugins.html). For URL, use a direct download link from the [releases page](https://github.com/nyurik/kibana-vega-vis/releases)
+* Follow Kibana plugin installation [instructions](https://www.elastic.co/guide/en/kibana/current/_installing_plugins.html). For URL, use a direct download link from the [releases page](https://github.com/nyurik/kibana-vega-vis/releases/latest). Typical command (without spaces):
+```
+bin/kibana-plugin install \
+   https://github.com/nyurik/kibana-vega-vis/releases/download/  v0.2.0  /vega_vis--  5.5.0  --  0.2.0  .zip
+```
+
 * In Kibana, choose Visualize, and add Vega visualization.
 * Copy this VegaLite into the left panel. You should immediatelly see the graph.
 ```yaml
