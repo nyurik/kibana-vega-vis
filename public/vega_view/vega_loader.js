@@ -2,12 +2,42 @@ import * as vega from 'vega';
 
 export function createVegaLoader(es, timefilter, dashboardContext) {
 
+  const SIMPLE_QUERY = '%context_query%';
   const TIMEFILTER = '%timefilter%';
   const MUST_CLAUSE = '%dashboard_context-must_clause%';
   const MUST_NOT_CLAUSE = '%dashboard_context-must_not_clause%';
 
   function queryEsData(uri) {
-    injectContextVars(uri);
+    uri.body = uri.body || {};
+    const body = uri.body;
+
+    if (uri[SIMPLE_QUERY]) {
+      if (body && body.query) {
+        throw new Error(`Search request contains both "${SIMPLE_QUERY}" and "body.query" values`);
+      }
+
+      const field = uri[SIMPLE_QUERY];
+      if (field !== true && (typeof field !== 'string' || field.length === 0)) {
+        throw new Error(`"${SIMPLE_QUERY}" can either be true (ignores timefilter), ` +
+          'or it can be the name of the time field, e.g. "@timestamp"');
+      }
+      delete uri[SIMPLE_QUERY];
+
+      body.query = dashboardContext();
+
+      if (field !== true) {
+        // Inject range filter based on the timefilter values
+        const range = { [TIMEFILTER]: true };
+        injectTimeFilter(range);
+        body.query.bool.must.push({
+          range: {
+            [field]: range
+          }
+        });
+      }
+    } else {
+      injectContextVars(body.query);
+    }
     return es.search(uri);
   }
 

@@ -59,7 +59,7 @@ This plugin will automatically inject a projection called `"projection"`. Use it
 # Querying ElasticSearch
 By default, Vega's [data](https://vega.github.io/vega/docs/data/) element can use embedded and external data with a `"url"` parameter. Kibana plugin adds support for the direct ElasticSearch queries by overloading the "url"` value.
 
-Here is an example of an ES query that creates two
+Here is an example of an ES query that gets data from `logstash-*` index, filtering by 
 
 ```yaml
 {
@@ -70,24 +70,13 @@ Here is an example of an ES query that creates two
         // Index name
         "index": "logstash-*",
 
-        // Query request - can be copied from the debug view of another visualizer
-        // You can try this query in Kibana Dev tools (hardcode or remove the %timefilter% first)
+        // Use current dashboard search string and time range filter with the "@timestamp" field.
+        // Set value to true to ignore the time filter
+        "%context_query%": "@timestamp",
+
+        // TIP: request can be copied from the debug view of another visualizer
+        // You can try this query in Kibana Dev tools (hardcode or remove the `%...%` values first)
         "body": {
-          "query": {
-            "range": {
-              "@timestamp": {
-                // "%timefilter%" will be replaced with the current
-                // values of the time filter (from the upper right corner)
-                "%timefilter%": true
-
-                // Only work with %timefilter%
-                // Shift the current timefilter by...
-                "shift": 10,
-                "unit": "minute" // supports week, day, hour, minute, second
-              }
-            }
-          },
-
           // When aggegating, do not return individual documents that match the query
           "size": 0,
 
@@ -135,6 +124,47 @@ As a result, "myEsDataSource" will be a list of objects. Note that `"key"` is a 
     ...
 ]
 ```
+
+Query may be specified with individual range and dashboard context as well. This query is equivalent to `"%context_query%": "@timestamp"`, except that the timerange is shifted back by 10 minutes:
+
+```yaml
+{
+  "data": [
+    {
+      "name": "myEsDataSource",
+      "url": {
+        // Index name
+        "index": "logstash-*",
+
+        "body": {
+          "query": {
+            "bool": {
+              "must": [
+                "range": {
+                  // apply timefilter (upper right corner) to the @timestamp variable
+                  "@timestamp": {
+                    // "%timefilter%" will be replaced with the current
+                    // values of the time filter (from the upper right corner)
+                    "%timefilter%": true
+    
+                    // Only work with %timefilter%
+                    // Shift the current timefilter by 10 units back
+                    "shift": 10,
+                    
+                    // supports week, day (default), hour, minute, second.
+                    "unit": "minute"
+                  }
+                }
+              ],
+              "must_not": [
+                // This string will be replaced with the auto-generated "MUST-NOT" clause
+                "%dashboard_context-must_not_clause%"
+              ]
+            }
+          },
+     ...
+```
+
 
 # Vega vs VegaLite
 VegaLite is a simplified version of Vega, useful to quickly get started, but has a number of limitations.  VegaLite is automatically converted into Vega before rendering. Compare [logstash-simple_line-vega](public/examples/logstash/logstash-simple_line-vega.json) and [logstash-simple_line-vegalite](public/examples/logstash/logstash-simple_line-vegalite.json) (both use the same ElasticSearch logstash data). You may use [this editor](https://vega.github.io/editor/) to convert VegaLite into Vega.
