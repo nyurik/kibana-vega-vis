@@ -24,6 +24,7 @@
     "test:server": "plugin-helpers test:server",
     "test:browser": "plugin-helpers test:browser",
     "build": "plugin-helpers build",
+    "buildall": "scripts/buildall.sh",
     "postinstall": "plugin-helpers postinstall",
     "elasticsearch": "cd ../kibana/ && npm run elasticsearch",
     "pullkibana": "cd ../kibana/ && git pull"
