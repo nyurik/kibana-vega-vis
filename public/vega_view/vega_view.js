@@ -54,6 +54,7 @@ export class VegaView {
     }
   }
 
+  // BUG: FIXME: if this method is called twice without awaiting, the sceond call will return success right away
   async destroy() {
     if (this._destroyHandlers) {
       const handlers = this._destroyHandlers;

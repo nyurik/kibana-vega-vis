@@ -57,6 +57,7 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
         ],
         createGraph
       );
+      $scope.$on('courier:searchRefresh', createGraph);
 
       resizeChecker.on('resize', () => {
         resizeChecker.modifySizeWithoutTriggeringResize(() => this.vegaView.resize());
