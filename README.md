@@ -140,6 +140,9 @@ Query may be specified with individual range and dashboard context as well. This
           "query": {
             "bool": {
               "must": [
+                // This string will be replaced with the auto-generated "MUST" clause
+                "%dashboard_context-must_clause%",
+
                 "range": {
                   // apply timefilter (upper right corner) to the @timestamp variable
                   "@timestamp": {
