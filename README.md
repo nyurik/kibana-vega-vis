@@ -36,8 +36,8 @@ bin/kibana-plugin install \
 }
 ```
 * Try changing `mark` from `bar` to `point`, `line`, `area`, `circle`, `square`, ... (see [docs](https://vega.github.io/vega-lite/docs/mark.html#mark-def))
-* Try other [Vega](https://vega.github.io/vega/examples/) or [VegaLite](https://vega.github.io/vega-lite/examples/) visualizations (see notes below)
-* Try a [map example](public/examples/external_and_embedded_data/map_unemployment_data.json)
+* Try other [Vega](https://vega.github.io/vega/examples/) or [VegaLite](https://vega.github.io/vega-lite/examples/) visualizations. You may need to make URLs absolute, e.g. replace `"url": "data/world-110m.json"` with `"url": "https://vega.github.io/editor/data/world-110m.json"`. (see [notes below](#Using Vega and VegaLite examples))
+* Using [makelogs util](https://www.npmjs.com/package/makelogs), generate some logstash data and try [logstash examples](public/examples/logstash), including the [map example](public/examples/logstash/logstash-geosrc-map.json)
 
 # Vega with a map
 Kibana's default map can be used as a base of the Vega graph. To enable, the graph must specify `type=map` in the host configuration:
