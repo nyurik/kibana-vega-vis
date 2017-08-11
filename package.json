@@ -48,8 +48,8 @@
     "leaflet-vega": "^0.4.0",
     "semver": "^5.4.1",
     "split.js": "^1.3.5",
-    "vega": "^3.0.0-rc6",
-    "vega-lite": "^2.0.0-beta.11",
+    "vega": "^3.0.1",
+    "vega-lite": "^2.0.0-beta.13",
     "vega-schema-url-parser": "^1.0.0-beta.2"
   }
 }

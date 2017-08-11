@@ -1,4 +1,3 @@
-import chrome from 'ui/chrome';
 import hjson from 'hjson';
 import compactStringify from 'json-stringify-pretty-compact';
 import split from 'split.js';
