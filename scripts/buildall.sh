@@ -6,8 +6,7 @@ mkdir -p buildall
 function build {
     npm run build -- -k $1
     for old in build/vega_vis-*; do
-      echo
-      new=$(echo $old | sed -e "s/^build\/vega_vis-/buildall\/vega_vis--$1--/")
+      new=$(echo $old | sed -E "s/(^build)(\/vega_vis-.+)\.zip$/buildall\2--for-Kibana-$1.zip/")
       mv -v "$old" "$new"
     done
 }
