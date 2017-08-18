@@ -48,6 +48,11 @@
           values: ["doc_count"]
         }
         {type: "filter", expr: "datum.doc_count != null"}
+        {
+          type: formula
+          expr: geoCentroid('projection', datum)
+          as: center
+        }
       ]
     }
     {
@@ -87,6 +92,17 @@
       transform: [
         {type: "geoshape", projection: "projection"}
       ]
+    }
+    {
+      type: symbol
+      from: {data: "counties"}
+      encode: {
+        update: {
+          size: {value: 0}
+          xc: {signal: "datum.center[0]"}
+          yc: {signal: "datum.center[1]"}
+        }
+      }
     }
     {
       type: group
