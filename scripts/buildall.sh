@@ -13,3 +13,4 @@ function build {
 
 build 5.5.0
 build 5.5.1
+build 5.5.2
