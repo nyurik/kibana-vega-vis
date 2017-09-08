@@ -8,7 +8,7 @@ import { createVegaLoader } from './vega_loader';
 
 // FIXME: handle runtime errors by overrwriting  vega.logging.error ...
 export class VegaView {
-  constructor(parentEl, inputSpec, timefilter, dashboardContext, es, serviceSettings, onError, onWarn) {
+  constructor(parentEl, inputSpec, timefilter, indexPatterns, dashboardContext, es, serviceSettings, onError, onWarn) {
     this._onWarn = onWarn;
     this._onError = onError;
     this._parentEl = parentEl;
@@ -20,7 +20,7 @@ export class VegaView {
     this._view = null;
 
     this._viewConfig = {
-      loader: createVegaLoader(es, timefilter, dashboardContext),
+      loader: createVegaLoader(es, timefilter, indexPatterns, dashboardContext),
       logLevel: vega.Warn,
       renderer: 'canvas',
     };

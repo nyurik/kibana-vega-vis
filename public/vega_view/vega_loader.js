@@ -1,6 +1,6 @@
 import * as vega from 'vega';
 
-export function createVegaLoader(es, timefilter, dashboardContext) {
+export function createVegaLoader(es, timefilter, indexPatterns, dashboardContext) {
 
   const SIMPLE_QUERY = '%context_query%';
   const TIMEFILTER = '%timefilter%';
@@ -14,6 +14,16 @@ export function createVegaLoader(es, timefilter, dashboardContext) {
     if (uri[SIMPLE_QUERY]) {
       if (body.query) {
         throw new Error(`Search request contains both "${SIMPLE_QUERY}" and "body.query" values`);
+      }
+
+      if (!body.index) {
+        //
+        // FIXME: TODO:   We should support index replacement here
+        // For some reason id is not set
+        // Possibly the indexPattern needs to be inherited somehow from the context
+        //
+        // body.index = (await indexPatterns.get()).index.id;  // ?
+        //
       }
 
       const field = uri[SIMPLE_QUERY];
