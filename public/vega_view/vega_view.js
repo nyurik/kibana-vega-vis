@@ -88,6 +88,9 @@ export class VegaView {
   }
 
   async _initRawVega() {
+    // In some cases, Vega may be initialized twice... TBD
+    if (!this._$container) return;
+
     const view = new vega.View(vega.parse(this._specParams.spec), this._viewConfig);
     view.warn = this._onWarn;
     view.error = this._onError;
@@ -110,6 +113,9 @@ export class VegaView {
 
     const url = tmsService.getUrl();
     const options = tmsService.getTMSOptions();
+
+    // In some cases, Vega may be initialized twice... TBD
+    if (!this._$container) return;
 
     const map = L.map(this._$container.get(0), {
       minZoom: options.minZoom,
