@@ -12,7 +12,7 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
 
     messages = [];
 
-    onError = (error) => {
+    onError(error) {
       if (!error) {
         error = 'ERR';
       } else if (error instanceof Error) {
@@ -20,14 +20,18 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
         error = error.message;
       }
       this.messages.push({ type: 'error', data: error });
-    };
+    }
 
-    onWarn = (warning) => {
+    onWarn(warning) {
       this.messages.push({ type: 'warning', data: warning });
-    };
+    }
 
     link($scope, $el/*, $attr*/) {
       const resizeChecker = new ResizeChecker($el);
+
+      const onResize = () => {
+        resizeChecker.modifySizeWithoutTriggeringResize(() => this.vegaView.resize());
+      };
 
       const createGraph = async () => {
         this.messages = [];
@@ -45,7 +49,7 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
           this.onError(error);
         }
 
-        resizeChecker.modifySizeWithoutTriggeringResize(() => this.vegaView.resize());
+        onResize();
       };
 
       $scope.timefilter = timefilter;
@@ -59,9 +63,7 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
       );
       $scope.$on('courier:searchRefresh', createGraph);
 
-      resizeChecker.on('resize', () => {
-        resizeChecker.modifySizeWithoutTriggeringResize(() => this.vegaView.resize());
-      });
+      resizeChecker.on('resize', onResize);
 
       $scope.$on('$destroy', () => {
         this.vegaView.destroy().catch(error => this.onError(error));
