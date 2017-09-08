@@ -2,6 +2,7 @@ import * as vega from 'vega';
 import * as vegaLite from 'vega-lite';
 import schemaParser from 'vega-schema-url-parser';
 import versionCompare from 'compare-versions';
+import Vsi from 'vega-spec-injector';
 
 const DEFAULT_SCHEMA = 'https://vega.github.io/schema/vega/v3.0.json';
 
@@ -114,6 +115,11 @@ export function parseInputSpec(inputSpec, onWarning) {
 
   if (useResize && (spec.width || spec.height)) {
     onWarning('The \'width\' and \'height\' params are ignored with autosize=fit');
+  }
+
+  if (!isVegaLite) {
+    const vsi = new Vsi(onWarning);
+    vsi.addToList(spec, `signals`, [`contextFilter`]);
   }
 
   return {
