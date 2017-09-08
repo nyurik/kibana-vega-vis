@@ -12,7 +12,7 @@ export function createVegaLoader(es, timefilter, dashboardContext) {
     const body = uri.body;
 
     if (uri[SIMPLE_QUERY]) {
-      if (body && body.query) {
+      if (body.query) {
         throw new Error(`Search request contains both "${SIMPLE_QUERY}" and "body.query" values`);
       }
 
