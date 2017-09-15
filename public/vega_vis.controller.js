@@ -30,7 +30,7 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
       const resizeChecker = new ResizeChecker($el);
 
       const onResize = () => {
-        resizeChecker.modifySizeWithoutTriggeringResize(() => this.vegaView.resize());
+        resizeChecker.modifySizeWithoutTriggeringResize(() => this.vegaView && this.vegaView.resize());
       };
 
       const createGraph = async () => {
@@ -43,7 +43,7 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
           if (this.vegaView) {
             await this.vegaView.destroy();
           }
-          this.vegaView = new VegaView($el, spec, timefilter, dashboardContext, es, serviceSettings, this.onError, this.onWarn);
+          this.vegaView = new VegaView($el, spec, timefilter, dashboardContext, es, serviceSettings, this.onError.bind(this), this.onWarn.bind(this));
           await this.vegaView.init();
         } catch (error) {
           this.onError(error);
