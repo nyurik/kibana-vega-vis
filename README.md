@@ -185,7 +185,7 @@ VegaLite is a simplified version of Vega, useful to quickly get started, but has
 * Vega [Tutorial](https://vega.github.io/vega/tutorials/), [docs](https://vega.github.io/vega/docs/), [examples](https://vega.github.io/vega/examples/)
 
 ### Using Vega and VegaLite examples
-When using [Vega](https://vega.github.io/vega/examples/) and [VegaLite](https://vega.github.io/vega-lite/examples/) examples, you may need to modify the "data" section to use absolute URL. For example, replace `"url": "data/world-110m.json"` with `"url": "https://vega.github.io/editor/data/world-110m.json"`. Also, regular Vega (not VegaLite) examples use `"autosize": "pad"` layout model, whereas Kibana plugin uses `fit`. See [sizing and positioning](#Sizing and positioning) below.
+When using [Vega](https://vega.github.io/vega/examples/) and [VegaLite](https://vega.github.io/vega-lite/examples/) examples, you may need to modify the "data" section to use absolute URL. For example, replace `"url": "data/world-110m.json"` with `"url": "https://vega.github.io/editor/data/world-110m.json"`. Also, regular Vega (not VegaLite) examples use `"autosize": "pad"` layout model, whereas Kibana plugin uses `fit`. See [sizing and positioning](#sizing-and-positioning) below.
 
 ### Additional configuration options
 ```yaml
