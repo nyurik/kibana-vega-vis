@@ -56,10 +56,11 @@ export function parseInputSpec(inputSpec, onWarning) {
   let minZoom = hostConfig && hostConfig.minZoom;
   let maxZoom = hostConfig && hostConfig.maxZoom;
   let zoomControl = hostConfig && hostConfig.zoomControl;
+  let maxBounds = hostConfig && hostConfig.maxBounds;
 
   if (!useMap && (
       mapStyle !== undefined || delayRepaint !== undefined || latitude !== undefined || longitude !== undefined ||
-      zoom !== undefined || minZoom !== undefined || maxZoom !== undefined || zoomControl !== undefined
+      zoom !== undefined || minZoom !== undefined || maxZoom !== undefined || zoomControl !== undefined || maxBounds !== undefined
     )) {
     throw new Error('_hostConfig must have type="map" when used with latitude/longitude/zoom parameters');
   }
@@ -96,6 +97,12 @@ export function parseInputSpec(inputSpec, onWarning) {
       onWarning('zoomControl must be a boolean value');
       zoomControl = true;
     }
+
+    if (maxBounds !== undefined && (!Array.isArray(maxBounds) || maxBounds.length !== 4 ||
+        !maxBounds.every(v => typeof v === 'number' && Number.isFinite(v)))) {
+      onWarning(`hostConfig.maxBounds must be an array with four numbers`);
+      maxBounds = undefined;
+    }
   }
 
   // Calculate container-direction CSS property for binding placement
@@ -117,6 +124,11 @@ export function parseInputSpec(inputSpec, onWarning) {
   }
   const controlsDir = controlsDirection === 'horizontal' ? 'row' : 'column';
 
+  // Default autosize should be fit, unless it's a map (leaflet-vega handles that)
+  if (spec.autosize === undefined && !useMap) {
+    spec.autosize = { type: 'fit', contains: 'padding' };
+  }
+
   if (isVegaLite) {
     if (useMap) {
       throw new Error('"_map" configuration is not compatible with vega-lite spec');
@@ -125,12 +137,7 @@ export function parseInputSpec(inputSpec, onWarning) {
     spec = vegaLite.compile(spec).spec;
   }
 
-  // Default autosize should be fit, unless it's a map (leaflet-vega handles that)
-  if (spec.autosize === undefined && !useMap) {
-    spec.autosize = { type: 'fit', contains: 'padding' };
-  }
-
-  const useResize = !isVegaLite && !useMap && (spec.autosize === 'fit' || spec.autosize.type === 'fit');
+  const useResize = !useMap && (spec.autosize === 'fit' || spec.autosize.type === 'fit');
   const useHover = !isVegaLite;
 
   // Padding is not included in the width/height by default
@@ -147,12 +154,17 @@ export function parseInputSpec(inputSpec, onWarning) {
   }
 
   if (useResize && (spec.width || spec.height)) {
-    onWarning('The \'width\' and \'height\' params are ignored with autosize=fit');
+    if (vegaLite) {
+      delete spec.width;
+      delete spec.height;
+    } else {
+      onWarning('The \'width\' and \'height\' params are ignored with autosize=fit');
+    }
   }
 
   return {
     spec, paddingWidth, paddingHeight, useMap, mapStyle, delayRepaint, latitude, longitude,
-    zoom, minZoom, maxZoom, zoomControl,
+    zoom, minZoom, maxZoom, zoomControl, maxBounds,
     useResize, useHover, containerDir, controlsDir
   };
 }

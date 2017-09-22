@@ -8,14 +8,15 @@
     "mapStyle": false,
     "minZoom": 4,
     "maxZoom": 9,
-    "zoomControl": false
+    "zoomControl": false,
+    "delayRepaint": false
   },
   "data": [
     {
       "name": "points",
       "url": {
         "index": "elastic_on_simple",
-        "body": {"size": 10000, "query": {"match_all": {}}}
+        "body": {"size": 10000}
       },
       "format": {"type": "json", "property": "hits.hits"},
       "transform": [

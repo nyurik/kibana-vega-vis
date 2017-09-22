@@ -146,12 +146,20 @@ export class VegaView {
     }
     const zoom = validate(`zoom`, specParams.zoom, 2, minZoom, maxZoom);
 
+    let maxBounds = null;
+    if (specParams.maxBounds) {
+      const b = specParams.maxBounds;
+      maxBounds = L.latLngBounds(L.latLng(b[1], b[0]), L.latLng(b[3], b[2]));
+    }
+
     const map = L.map(this._$container.get(0), {
-      minZoom: minZoom,
-      maxZoom: maxZoom,
+      minZoom,
+      maxZoom,
       center: [specParams.latitude, specParams.longitude],
-      zoom: zoom,
+      zoom,
       zoomControl: specParams.zoomControl,
+      // TODO: test and enable
+      // maxBounds
     });
 
     if (useDefaultMap) {
