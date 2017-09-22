@@ -55,10 +55,11 @@ export function parseInputSpec(inputSpec, onWarning) {
   let zoom = hostConfig && hostConfig.zoom;
   let minZoom = hostConfig && hostConfig.minZoom;
   let maxZoom = hostConfig && hostConfig.maxZoom;
+  let zoomControl = hostConfig && hostConfig.zoomControl;
 
   if (!useMap && (
       mapStyle !== undefined || delayRepaint !== undefined || latitude !== undefined || longitude !== undefined ||
-      zoom !== undefined || minZoom !== undefined || maxZoom !== undefined
+      zoom !== undefined || minZoom !== undefined || maxZoom !== undefined || zoomControl !== undefined
     )) {
     throw new Error('_hostConfig must have type="map" when used with latitude/longitude/zoom parameters');
   }
@@ -88,6 +89,7 @@ export function parseInputSpec(inputSpec, onWarning) {
     zoom = validate(`zoom`, zoom, true);
     minZoom = validate(`minZoom`, minZoom, true);
     maxZoom = validate(`maxZoom`, maxZoom, true);
+    zoomControl = !!zoomControl;
   }
 
   // Calculate container-direction CSS property for binding placement
@@ -143,7 +145,8 @@ export function parseInputSpec(inputSpec, onWarning) {
   }
 
   return {
-    spec, paddingWidth, paddingHeight, useMap, mapStyle, delayRepaint, latitude, longitude, zoom, minZoom, maxZoom,
+    spec, paddingWidth, paddingHeight, useMap, mapStyle, delayRepaint, latitude, longitude,
+    zoom, minZoom, maxZoom, zoomControl,
     useResize, useHover, containerDir, controlsDir
   };
 }

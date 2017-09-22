@@ -54,6 +54,7 @@ Kibana's default map can be used as a base of the Vega graph. To enable, the gra
     "mapStyle": "default", // defaults to "default", but can also be false to disable base layer
     "minZoom": 5,          // default 0
     "maxZoom": 13,         // defaults to the maximum for the given style, or 25 when base is disabled
+    "zoomControl": false,  // defaults to true, shows +/- buttons to zoom in/out
 
     // When false, repaints on each move frame. Makes the graph much slower
     "delayRepaint": true, // default true

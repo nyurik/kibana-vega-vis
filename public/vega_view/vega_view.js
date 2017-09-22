@@ -151,6 +151,7 @@ export class VegaView {
       maxZoom: maxZoom,
       center: [specParams.latitude, specParams.longitude],
       zoom: zoom,
+      zoomControl: specParams.zoomControl,
     });
 
     if (useDefaultMap) {
