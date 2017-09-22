@@ -1,0 +1,168 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+  "_hostConfig": {
+    "type": "map",
+    "latitude": 10,
+    "longitude": 21,
+    "zoom": 4,
+    "mapStyle": false,
+    "minZoom": 4,
+    "maxZoom": 9,
+    "zoomControl": false
+  },
+  "data": [
+    {
+      "name": "points",
+      "url": {
+        "index": "elastic_on_simple",
+        "body": {"size": 10000, "query": {"match_all": {}}}
+      },
+      "format": {"type": "json", "property": "hits.hits"},
+      "transform": [
+        {
+          "type": "formula",
+          "as": "lon",
+          "expr": "datum._source.location.lon"
+        },
+        {
+          "type": "formula",
+          "as": "lat",
+          "expr": "datum._source.location.lat"
+        }
+      ]
+    },
+    {
+      "name": "background",
+      "url": "https://gist.githubusercontent.com/nyurik/ee9af6e5d82ebf55b2ef01132811e891/raw/13bed68570b7436c686311302fa34211c11f3eab/temp.geojson",
+      "format": {"type": "json", "property": "features"}
+    },
+    {
+      "name": "areas",
+      "source": "background",
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "datum.properties && datum.properties.layer"
+        }
+      ]
+    },
+    {
+      "name": "labels",
+      "source": "background",
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "datum.properties && datum.properties.text"
+        },
+        {
+          "type": "formula",
+          "as": "lon",
+          "expr": "datum.geometry.coordinates[0]"
+        },
+        {
+          "type": "formula",
+          "as": "lat",
+          "expr": "datum.geometry.coordinates[1]"
+        }
+      ]
+    }
+  ],
+  "scales": [],
+  "marks": [
+    {
+      "type": "shape",
+      "from": {"data": "areas"},
+      "encode": {
+        "update": {
+          "stroke": [
+            {
+              "test": "datum.properties.layer == 'outer_walls' || datum.properties.layer == 'inner_walls'",
+              "value": "#000000"
+            },
+            {
+              "test": "datum.properties.layer == 'demo_stands'",
+              "value": "#999999"
+            },
+            {
+              "test": "datum.properties.layer == 'demo_booths'",
+              "value": "#00BFB3"
+            },
+            {"value": "#ff0000"}
+          ],
+          "strokeWidth": [
+            {
+              "test": "datum.properties.layer == 'outer_walls'",
+              "signal": "3*pow(2,zoom-4)"
+            },
+            {
+              "test": "datum.properties.layer == 'demo_stands'",
+              "signal": "0.1*pow(2,zoom-4)"
+            },
+            {
+              "test": "datum.properties.layer == 'demo_booths'",
+              "signal": "0.5*pow(2,zoom-4)"
+            },
+            {"signal": "1*pow(2,zoom-4)"}
+          ],
+          "strokeDash": [
+            {
+              "test": "datum.properties.layer == 'inner_walls'",
+              "signal": "[10*pow(2,zoom-4), 2*pow(2,zoom-4)]"
+            },
+            {"value": []}
+          ],
+          "fillOpacity": [
+            {
+              "test": "datum.properties.layer == 'demo_stands'",
+              "value": 1
+            },
+            {"value": 0}
+          ],
+          "fill": {"value": "#D5D5D5"}
+        }
+      },
+      "transform": [
+        {"type": "geoshape", "projection": "projection"}
+      ]
+    },
+    {
+      "type": "text",
+      "from": {"data": "labels"},
+      "transform": [
+        {
+          "type": "geopoint",
+          "projection": "projection",
+          "fields": ["datum.lon", "datum.lat"]
+        }
+      ],
+      "encode": {
+        "update": {
+          "text": {"signal": "datum.properties.text"},
+          "fill": {"value": "#000"},
+          "align": {"value": "center"}
+        }
+      }
+    },
+    {
+      "type": "symbol",
+      "from": {"data": "points"},
+      "transform": [
+        {
+          "type": "geopoint",
+          "projection": "projection",
+          "fields": ["datum.lon", "datum.lat"]
+        }
+      ],
+      "encode": {
+        "update": {
+          "stroke": {"value": "#ffff00"},
+          "strokeOpacity": {"value": 0.01},
+          "fill": {"value": "#ff0000"},
+          "fillOpacity": {"value": 0.02},
+          "strokeWidth": {"signal": "5*pow(2,zoom-4)"},
+          "size": {"signal": "300*pow(2,zoom-4)"}
+        }
+      }
+    }
+  ]
+}
