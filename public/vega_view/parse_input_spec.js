@@ -89,7 +89,13 @@ export function parseInputSpec(inputSpec, onWarning) {
     zoom = validate(`zoom`, zoom, true);
     minZoom = validate(`minZoom`, minZoom, true);
     maxZoom = validate(`maxZoom`, maxZoom, true);
-    zoomControl = !!zoomControl;
+
+    if (zoomControl === undefined) {
+      zoomControl = true;
+    } else if (typeof zoomControl !== 'boolean') {
+      onWarning('zoomControl must be a boolean value');
+      zoomControl = true;
+    }
   }
 
   // Calculate container-direction CSS property for binding placement
