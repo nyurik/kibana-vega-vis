@@ -109,35 +109,66 @@ export class VegaView {
   }
 
   async _initLeafletVega() {
-    const tmsService = await this._serviceSettings.getTMSService();
+    const specParams = this._specParams;
+    const useDefaultMap = specParams.mapStyle !== false;
 
-    const url = tmsService.getUrl();
-    const options = tmsService.getTMSOptions();
+    let limits, url, baseLayer;
 
-    // In some cases, Vega may be initialized twice... TBD
+    if (useDefaultMap) {
+      const tmsService = await this._serviceSettings.getTMSService();
+      url = tmsService.getUrl();
+      limits = tmsService.getTMSOptions();
+    } else {
+      limits = {minZoom: 0, maxZoom: 25};
+    }
+
+    // In some cases, Vega may be initialized twice, e.g. after awaiting... TBD
     if (!this._$container) return;
 
+    let validate = (name, value, dflt, min, max) => {
+      if (value === undefined) {
+        value = dflt;
+      } else if (value < min) {
+        this._onWarn(`Reseting ${name} to ${min}`);
+        value = min;
+      } else if (value > max) {
+        this._onWarn(`Reseting ${name} to ${max}`);
+        value = max;
+      }
+      return value;
+    };
+
+    let minZoom = validate(`minZoom`, specParams.minZoom, limits.minZoom, limits.minZoom, limits.maxZoom);
+    let maxZoom = validate(`maxZoom`, specParams.maxZoom, limits.maxZoom, limits.minZoom, limits.maxZoom);
+    if (minZoom > maxZoom) {
+      this._onWarn(`minZoom and maxZoom have been swapped`);
+      [minZoom, maxZoom] = [maxZoom, minZoom];
+    }
+    const zoom = validate(`zoom`, specParams.zoom, 2, minZoom, maxZoom);
+
     const map = L.map(this._$container.get(0), {
-      minZoom: options.minZoom,
-      maxZoom: options.maxZoom,
-      center: [this._specParams.latitude, this._specParams.longitude],
-      zoom: Math.min(options.maxZoom, Math.max(options.minZoom, this._specParams.zoom))
+      minZoom: minZoom,
+      maxZoom: maxZoom,
+      center: [specParams.latitude, specParams.longitude],
+      zoom: zoom,
     });
 
-    const baseLayer = L
-      .tileLayer(url, {
-        minZoom: options.minZoom,
-        maxZoom: options.maxZoom,
-        subdomains: options.subdomains || [],
-        attribution: options.attribution
-      })
-      .addTo(map);
+    if (useDefaultMap) {
+      baseLayer = L
+        .tileLayer(url, {
+          minZoom: limits.minZoom,
+          maxZoom: limits.maxZoom,
+          subdomains: limits.subdomains || [],
+          attribution: limits.attribution
+        })
+        .addTo(map);
+    }
 
     const vegaLayer = L
-      .vega(this._specParams.spec, {
+      .vega(specParams.spec, {
         vega,
         bindingsContainer: this._$controls.get(0),
-        delayRepaint: this._specParams.delayRepaint,
+        delayRepaint: specParams.delayRepaint,
         viewConfig: this._viewConfig,
         onWarning: this._onWarn,
         onError: this._onError
@@ -146,7 +177,7 @@ export class VegaView {
 
     this._addDestroyHandler(() => {
       map.removeLayer(vegaLayer);
-      map.removeLayer(baseLayer);
+      if (baseLayer) map.removeLayer(baseLayer);
       map.remove();
     });
   }

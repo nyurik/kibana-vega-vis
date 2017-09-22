@@ -48,9 +48,12 @@ Kibana's default map can be used as a base of the Vega graph. To enable, the gra
     "type": "map",
 
     // Initial map position
-    "latitude": 40.7,     // default 0
-    "longitude": -74,     // default 0
-    "zoom": 7,            // default 2
+    "latitude": 40.7,      // default 0
+    "longitude": -74,      // default 0
+    "zoom": 7,             // default 2
+    "mapStyle": "default", // defaults to "default", but can also be false to disable base layer
+    "minZoom": 5,          // default 0
+    "maxZoom": 13,         // defaults to the maximum for the given style, or 25 when base is disabled
 
     // When false, repaints on each move frame. Makes the graph much slower
     "delayRepaint": true, // default true

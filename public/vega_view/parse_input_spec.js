@@ -48,20 +48,46 @@ export function parseInputSpec(inputSpec, onWarning) {
   }
 
   const useMap = !!(hostConfig && hostConfig.type === 'map');
+  let mapStyle = hostConfig && hostConfig.mapStyle;
   let delayRepaint = hostConfig && hostConfig.delayRepaint;
   let latitude = hostConfig && hostConfig.latitude;
   let longitude = hostConfig && hostConfig.longitude;
   let zoom = hostConfig && hostConfig.zoom;
+  let minZoom = hostConfig && hostConfig.minZoom;
+  let maxZoom = hostConfig && hostConfig.maxZoom;
 
-  if (!useMap && (latitude !== undefined || longitude !== undefined || zoom !== undefined || delayRepaint !== undefined)) {
+  if (!useMap && (
+      mapStyle !== undefined || delayRepaint !== undefined || latitude !== undefined || longitude !== undefined ||
+      zoom !== undefined || minZoom !== undefined || maxZoom !== undefined
+    )) {
     throw new Error('_hostConfig must have type="map" when used with latitude/longitude/zoom parameters');
   }
 
   if (useMap) {
-    longitude = longitude || 0;
-    latitude = latitude || 0;
-    zoom = zoom === undefined ? 2 : zoom;
+    // `false` is a valid value
+    mapStyle = mapStyle === undefined ? `default` : mapStyle;
+    if (mapStyle !== `default` && mapStyle !== false) {
+      onWarning(`hostConfig.mapStyle may either be false or "default"`);
+      mapStyle = `default`;
+    }
     delayRepaint = delayRepaint === undefined ? true : delayRepaint;
+
+    const validate = (name, val, isZoom) => {
+      if (val !== undefined) {
+        const parsed = Number.parseFloat(val);
+        if (Number.isFinite(parsed) && (!isZoom || (parsed >= 0 && parsed <= 30))) {
+          return parsed;
+        }
+        onWarning(`_hostConfig.${name} is not valid`);
+      }
+      return undefined;
+    };
+
+    longitude = validate('longitude', longitude) || 0;
+    latitude = validate('latitude', latitude) || 0;
+    zoom = validate(`zoom`, zoom, true);
+    minZoom = validate(`minZoom`, minZoom, true);
+    maxZoom = validate(`maxZoom`, maxZoom, true);
   }
 
   // Calculate container-direction CSS property for binding placement
@@ -117,7 +143,7 @@ export function parseInputSpec(inputSpec, onWarning) {
   }
 
   return {
-    spec, paddingWidth, paddingHeight, useMap, latitude, longitude, zoom, delayRepaint,
+    spec, paddingWidth, paddingHeight, useMap, mapStyle, delayRepaint, latitude, longitude, zoom, minZoom, maxZoom,
     useResize, useHover, containerDir, controlsDir
   };
 }
