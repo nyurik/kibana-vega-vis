@@ -6,10 +6,11 @@
     "longitude": 21,
     "zoom": 4,
     "mapStyle": false,
-    "minZoom": 4,
+    "minZoom": 2,
     "maxZoom": 9,
     "zoomControl": false,
-    "delayRepaint": false
+    "delayRepaint": false,
+    "controlsDirection": "horizontal"
   },
   "data": [
     {
@@ -29,6 +30,15 @@
           "type": "formula",
           "as": "lat",
           "expr": "datum._source.location.lat"
+        },
+        {
+          "type": "geopoint",
+          "projection": "projection",
+          "fields": [
+            {"expr": "datum._source.location.lon"},
+            {"expr": "datum._source.location.lat"}
+          ],
+          "as": ["x", "y"]
         }
       ]
     },
@@ -66,13 +76,37 @@
           "expr": "datum.geometry.coordinates[1]"
         }
       ]
+    },
+    {
+      "name": "contours",
+      "source": "points",
+      "transform": [
+        {
+          "type": "contour",
+          "x": {"expr": "datum.x"},
+          "y": {"expr": "datum.y"},
+          "bandwidth": {"signal": "bandwidth"},
+          "cellSize": {"signal": "cellSize"},
+          "size": [{"signal": "width"}, {"signal": "height"}],
+          "count": {"signal": "count"}
+        }
+      ]
     }
   ],
-  "scales": [],
+  "scales": [
+    {
+      "name": "color",
+      "type": "sequential",
+      "zero": true,
+      "domain": {"data": "contours", "field": "value"},
+      "range": {"scheme": "yelloworangered"}
+    }
+  ],
   "marks": [
     {
       "type": "shape",
       "from": {"data": "areas"},
+      "interactive": false,
       "encode": {
         "update": {
           "stroke": [
@@ -128,6 +162,7 @@
     },
     {
       "type": "text",
+      "interactive": false,
       "from": {"data": "labels"},
       "transform": [
         {
@@ -145,25 +180,55 @@
       }
     },
     {
-      "type": "symbol",
-      "from": {"data": "points"},
-      "transform": [
-        {
-          "type": "geopoint",
-          "projection": "projection",
-          "fields": ["datum.lon", "datum.lat"]
+      "type": "path",
+      "interactive": false,
+      "from": {"data": "contours"},
+      "encode": {
+        "enter": {
+          "fill": {"scale": "color", "field": "value"},
+          "fillOpacity": {"value": 0.35}
         }
-      ],
+      },
+      "transform": [{"type": "geopath", "field": "datum"}]
+    },
+    {
+      "type": "symbol",
+      "interactive": false,
+      "from": {"data": "points"},
       "encode": {
         "update": {
-          "stroke": {"value": "#ffff00"},
-          "strokeOpacity": {"value": 0.01},
           "fill": {"value": "#ff0000"},
-          "fillOpacity": {"value": 0.02},
-          "strokeWidth": {"signal": "5*pow(2,zoom-4)"},
-          "size": {"signal": "300*pow(2,zoom-4)"}
+          "fillOpacity": [
+            {"test": "!show_points", "value": 0},
+            {"value": 0.02}
+          ],
+          "size": {"signal": "50*pow(2,zoom-4)"},
+          "x": {"signal": "datum.x"},
+          "y": {"signal": "datum.y"}
         }
       }
+    }
+  ],
+  "signals": [
+    {
+      "name": "cellSize",
+      "value": 6,
+      "bind": {"input": "range", "min": 1, "max": 20, "step": 1}
+    },
+    {
+      "name": "bandwidth",
+      "value": 18,
+      "bind": {"input": "range", "min": 0, "max": 30, "step": 1}
+    },
+    {
+      "name": "count",
+      "value": 20,
+      "bind": {"input": "select", "options": [1, 5, 10, 20]}
+    },
+    {
+      "name": "show_points",
+      "value": true,
+      "bind": {"input": "checkbox"}
     }
   ]
 }
