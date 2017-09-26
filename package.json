@@ -43,7 +43,7 @@
     "eslint-plugin-react": "^7.3.0"
   },
   "dependencies": {
-    "compare-versions": "^3.0.1",
+    "compare-versions": "^3.1.0",
     "hjson": "^3.1.0",
     "json-stringify-pretty-compact": "^1.0.4",
     "leaflet-vega": "^0.5.3",
