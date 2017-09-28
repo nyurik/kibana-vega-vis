@@ -27,7 +27,7 @@
       }
     },
     {
-      "name": "counties",
+      "name": "countries",
       "url": "https://layers.geo.elastic.co/blob/5659313586569216?elastic_tile_service_tos=agree",
       "format": {"type": "json", "property": "features"},
       "transform": [
@@ -46,14 +46,14 @@
     {
       "name": "color",
       "type": "sqrt",
-      "domain": {"data": "counties", "field": "doc_count"},
+      "domain": {"data": "countries", "field": "doc_count"},
       "range": {"scheme": {"signal": "colors"}}
     }
   ],
   "marks": [
     {
       "type": "shape",
-      "from": {"data": "counties"},
+      "from": {"data": "countries"},
       "encode": {
         "enter": {
           "tooltip": {"signal": "format(datum.doc_count, '0,')"},
