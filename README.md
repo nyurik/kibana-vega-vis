@@ -56,7 +56,7 @@ Kibana's default map can be used as a base of the Vega graph. To enable, the gra
     "maxZoom": 13,         // defaults to the maximum for the given style, or 25 when base is disabled
     "zoomControl": false,  // defaults to true, shows +/- buttons to zoom in/out
 
-    // When false, repaints on each move frame. Makes the graph much slower
+    // When false, repaints on each move frame. Makes the graph slower when moving the map
     "delayRepaint": true, // default true
   },
   /* the rest of Vega JSON */
