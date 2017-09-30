@@ -183,7 +183,7 @@ VegaLite is a simplified version of Vega, useful to quickly get started, but has
 
 # Debugging
 Use browser debugging tools (e.g. F12 or Ctrl+Shift+J in Chrome) to inspect the `VEGA_DEBUG` variable:
- * `view` - access to the Vega View object. See [Vega Debugging Guide](https://vega.github.io/vega/docs/api/debugging/).
+ * `view` - access to the Vega View object. See [Vega Debugging Guide](https://vega.github.io/vega/docs/api/debugging/) on how to inspect runtime data, signals, and get snapshots. Try `VEGA_DEBUG.view.getState()`
  * `spec` - Vega JSON specification after some modifications by this plugin. In case of VegaLite, this is the output of the VegaLite compiler. 
  * `vlspec` - If this is a VegaLite graph, JSON specification of the graph before VegaLite compilation.
 
