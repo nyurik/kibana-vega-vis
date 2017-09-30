@@ -2,6 +2,7 @@ import $ from 'jquery';
 import L from 'leaflet';
 import 'leaflet-vega';
 import * as vega from 'vega';
+import * as vegaLite from 'vega-lite';
 
 import { parseInputSpec } from './parse_input_spec';
 import { createVegaLoader } from './vega_loader';
@@ -95,7 +96,10 @@ export class VegaView {
     // In some cases, Vega may be initialized twice... TBD
     if (!this._$container) return;
 
-    const view = new vega.View(vega.parse(this._specParams.spec), this._viewConfig);
+    const parsedVega = vega.parse(this._specParams.spec);
+    const view = new vega.View(parsedVega, this._viewConfig);
+    VegaView.setDebugValues(view, parsedVega);
+
     view.warn = this._onWarn;
     view.error = this._onError;
     if (this._specParams.useResize) this.updateVegaSize(view);
@@ -191,10 +195,31 @@ export class VegaView {
       })
       .addTo(map);
 
+    VegaView.setDebugValues(vegaLayer._view, vegaLayer._spec);
+
     this._addDestroyHandler(() => {
       map.removeLayer(vegaLayer);
       if (baseLayer) map.removeLayer(baseLayer);
       map.remove();
     });
+  }
+
+  /**
+   * Set global debug variable to simplify vega debugging in console. Show info message first time
+   */
+  static setDebugValues(view, spec) {
+    if (window) {
+      if (window.VEGA_DEBUG === undefined && console) {
+        /*eslint-disable */
+        console.log('%cWelcome to Kibana Vega Plugin!', 'font-size: 16px; font-weight: bold;');
+        console.log('You can access the Vega view with VEGA_DEBUG. Learn more at https://vega.github.io/vega/docs/api/debugging/.');
+      }
+
+      window.VEGA_DEBUG = window.VEGA_DEBUG || {};
+      window.VEGA_DEBUG.VEGA_VERSION = vega.version;
+      window.VEGA_DEBUG.VEGA_LITE_VERSION = vegaLite.version;
+      window.VEGA_DEBUG.view = view;
+      window.VEGA_DEBUG.spec = spec;
+    }
   }
 }
