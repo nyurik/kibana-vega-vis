@@ -181,6 +181,12 @@ Query may be specified with individual range and dashboard context as well. This
 # Vega vs VegaLite
 VegaLite is a simplified version of Vega, useful to quickly get started, but has a number of limitations.  VegaLite is automatically converted into Vega before rendering. Compare [logstash-simple_line-vega](public/examples/logstash/logstash-simple_line-vega.json) and [logstash-simple_line-vegalite](public/examples/logstash/logstash-simple_line-vegalite.json) (both use the same ElasticSearch logstash data). You may use [this editor](https://vega.github.io/editor/) to convert VegaLite into Vega.
 
+# Debugging
+Use browser debugging tools (e.g. F12 or Ctrl+Shift+J in Chrome) to inspect the `VEGA_DEBUG` variable:
+ * `view` - access to the Vega View object. See [Vega Debugging Guide](https://vega.github.io/vega/docs/api/debugging/).
+ * `spec` - Vega JSON specification after some modifications by this plugin. In case of VegaLite, this is the output of the VegaLite compiler. 
+ * `vlspec` - If this is a VegaLite graph, JSON specification of the graph before VegaLite compilation.
+
 # Notes
 
 ### Useful Links
@@ -199,7 +205,9 @@ When using [Vega](https://vega.github.io/vega/examples/) and [VegaLite](https://
     // Can be `left`, `right`, `top`, or `bottom` (default).
     "controlsLocation": "top",
     // Can be `vertical` or `horizontal` (default).
-    "controlsDirection": "vertical"
+    "controlsDirection": "vertical",
+    // If true, hides most of Vega and VegaLite warnings
+    "hideWarnings": true,
   },
   /* the rest of Vega JSON */
 }
@@ -207,7 +215,7 @@ When using [Vega](https://vega.github.io/vega/examples/) and [VegaLite](https://
 
 ### Sizing and positioning
 ##### Vega and VegaLite
-By default, Kibana Vega graphs will use `autosize = { type: 'fit', contains: 'padding' }` layout model for Vega and Vega Lite graphs. The `fit` model uses all available space, and ignore `width` and `height` values, but respects the padding values. You may override this behaviour by specifying a different `autosize` value.
+By default, Kibana Vega graphs will use `autosize = { type: 'fit', contains: 'padding' }` layout model for Vega and VegaLite graphs. The `fit` model uses all available space, and ignore `width` and `height` values, but respects the padding values. You may override this behaviour by specifying a different `autosize` value.
 
 ##### Vega on a map
 All Vega graphs will ignore `autosize`, `width`, `height`, and `padding` values, using `fit` model with zero padding.

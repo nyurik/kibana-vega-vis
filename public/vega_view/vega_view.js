@@ -16,6 +16,10 @@ export class VegaView {
     this._serviceSettings = serviceSettings;
 
     this._specParams = parseInputSpec(inputSpec, this._onWarn);
+    if (this._specParams.hideWarnings) {
+      this._onWarn = () => {};
+    }
+
     this._parentEl.css('flex-direction', this._specParams.containerDir);
 
     this._view = null;
@@ -96,9 +100,8 @@ export class VegaView {
     // In some cases, Vega may be initialized twice... TBD
     if (!this._$container) return;
 
-    const parsedVega = vega.parse(this._specParams.spec);
-    const view = new vega.View(parsedVega, this._viewConfig);
-    VegaView.setDebugValues(view, parsedVega);
+    const view = new vega.View(vega.parse(this._specParams.spec), this._viewConfig);
+    VegaView.setDebugValues(view, this._specParams.spec, this._specParams.vlspec);
 
     view.warn = this._onWarn;
     view.error = this._onError;
@@ -207,7 +210,7 @@ export class VegaView {
   /**
    * Set global debug variable to simplify vega debugging in console. Show info message first time
    */
-  static setDebugValues(view, spec) {
+  static setDebugValues(view, spec, vlspec) {
     if (window) {
       if (window.VEGA_DEBUG === undefined && console) {
         /*eslint-disable */
@@ -219,7 +222,8 @@ export class VegaView {
       window.VEGA_DEBUG.VEGA_VERSION = vega.version;
       window.VEGA_DEBUG.VEGA_LITE_VERSION = vegaLite.version;
       window.VEGA_DEBUG.view = view;
-      window.VEGA_DEBUG.spec = spec;
+      window.VEGA_DEBUG.vegaspec = spec;
+      window.VEGA_DEBUG.vlspec = vlspec;
     }
   }
 }

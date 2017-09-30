@@ -47,6 +47,11 @@ export function parseInputSpec(inputSpec, onWarning) {
     }
   }
 
+  const hideWarnings = hostConfig && !!hostConfig.hideWarnings;
+  if (hideWarnings) {
+    onWarning = () => {};
+  }
+
   const useMap = !!(hostConfig && hostConfig.type === 'map');
   let mapStyle = hostConfig && hostConfig.mapStyle;
   let delayRepaint = hostConfig && hostConfig.delayRepaint;
@@ -129,12 +134,15 @@ export function parseInputSpec(inputSpec, onWarning) {
     spec.autosize = { type: 'fit', contains: 'padding' };
   }
 
+  const vlspec = isVegaLite ? spec : undefined;
+
   if (isVegaLite) {
     if (useMap) {
       throw new Error('"_map" configuration is not compatible with vega-lite spec');
     }
-
-    spec = vegaLite.compile(spec).spec;
+    const logger = vega.logger(vega.Warn);
+    logger.warn = onWarning;
+    spec = vegaLite.compile(vlspec, logger).spec;
   }
 
   const useResize = !useMap && (spec.autosize === 'fit' || spec.autosize.type === 'fit');
@@ -163,8 +171,8 @@ export function parseInputSpec(inputSpec, onWarning) {
   }
 
   return {
-    spec, paddingWidth, paddingHeight, useMap, mapStyle, delayRepaint, latitude, longitude,
+    spec, vlspec, paddingWidth, paddingHeight, useMap, mapStyle, delayRepaint, latitude, longitude,
     zoom, minZoom, maxZoom, zoomControl, maxBounds,
-    useResize, useHover, containerDir, controlsDir
+    useResize, useHover, containerDir, controlsDir, hideWarnings
   };
 }
