@@ -3,6 +3,7 @@ import { dashboardContextProvider } from 'plugins/kibana/dashboard/dashboard_con
 import { VegaView } from './vega_view';
 
 import hjson from 'hjson';
+import compactStringify from 'json-stringify-pretty-compact';
 
 export function createVegaVisController(Private, /*$scope,*/ timefilter, es, serviceSettings) {
   const ResizeChecker = Private(ResizeCheckerProvider);
@@ -12,6 +13,24 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
 
     messages = [];
 
+    /**
+     * If the 2nd array parameter in args exists, append it to the warning/error string value
+     */
+    static expandError(value, args) {
+      if (args.length >= 2) {
+        try {
+          if (typeof args[1] === 'string') {
+            value += `\n${args[1]}`;
+          } else {
+            value += '\n' + compactStringify(args[1], {maxLength: 70});
+          }
+        } catch (err) {
+          // ignore
+        }
+      }
+      return value;
+    }
+
     onError(error) {
       if (!error) {
         error = 'ERR';
@@ -19,11 +38,12 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
         if (console && console.log) console.log(error);
         error = error.message;
       }
-      this.messages.push({ type: 'error', data: error });
+
+      this.messages.push({ type: 'error', data: VegaVisController.expandError(error, arguments) });
     }
 
     onWarn(warning) {
-      this.messages.push({ type: 'warning', data: warning });
+      this.messages.push({ type: 'warning', data: VegaVisController.expandError(warning, arguments) });
     }
 
     link($scope, $el/*, $attr*/) {
