@@ -1,9 +1,7 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
-  "width": 800,
-  "height": 600,
+  "!!note": "This graph will fail if there is no data in the result. Check time filter in the upper right corner.",
   "data": {
-    "name": "table",
     "url": {
       "index": "logstash-*",
       "body": {
@@ -13,9 +11,7 @@
               "%dashboard_context-must_clause%",
               {"range": {"@timestamp": {"%timefilter%": true}}}
             ],
-            "must_not": [
-              "%dashboard_context-must_not_clause%"
-            ]
+            "must_not": ["%dashboard_context-must_not_clause%"]
           }
         },
         "size": 0,
