@@ -15,27 +15,8 @@ bin/kibana-plugin install \
 ```
 
 * In Kibana, choose Visualize, and add Vega visualization.
-* Copy this VegaLite into the left panel. You should immediatelly see the graph.
-```yaml
-{
-  "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
-  "description": "A simple bar chart with embedded data.",
-  "padding": 5,
-  "data": {
-    "values": [
-      {"a": "A","b": 28}, {"a": "B","b": 55}, {"a": "C","b": 43},
-      {"a": "D","b": 91}, {"a": "E","b": 81}, {"a": "F","b": 53},
-      {"a": "G","b": 19}, {"a": "H","b": 87}, {"a": "I","b": 52}
-    ]
-  },
-  "mark": "bar",
-  "encoding": {
-    "x": {"field": "a", "type": "ordinal"},
-    "y": {"field": "b", "type": "quantitative"}
-  }
-}
-```
-* Try changing `mark` from `bar` to `point`, `line`, `area`, `circle`, `square`, ... (see [docs](https://vega.github.io/vega-lite/docs/mark.html#mark-def))
+* You should immediatelly see a default graph
+* Try changing `mark` from `line` to `point`, `area`, `bar`, `circle`, `square`, ... (see [docs](https://vega.github.io/vega-lite/docs/mark.html#mark-def))
 * Try other [Vega](https://vega.github.io/vega/examples/) or [VegaLite](https://vega.github.io/vega-lite/examples/) visualizations. You may need to make URLs absolute, e.g. replace `"url": "data/world-110m.json"` with `"url": "https://vega.github.io/editor/data/world-110m.json"`. (see [notes below](#Using Vega and VegaLite examples))
 * Using [makelogs util](https://www.npmjs.com/package/makelogs), generate some logstash data and try [logstash examples](public/examples/logstash), including the [map example](public/examples/logstash/logstash-geosrc-map.json)
 
