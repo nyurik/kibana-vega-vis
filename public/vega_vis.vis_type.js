@@ -2,6 +2,7 @@ import { VisFactoryProvider } from 'ui/vis/vis_factory';
 import { CATEGORY } from 'ui/vis/vis_category';
 import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
 import { VegaEditorProvider } from './vega_vis_editor';
+import { VegaRequestHandlerProvider } from './vega_request_handler';
 import './vega_vis_editor.less';
 
 import './vega_vis.directive';
@@ -12,6 +13,7 @@ import defaultSpec from '!!raw-loader!./default.spec.json';
 VisTypesRegistryProvider.register(function VegaVisProvider(Private) {
   const VisFactory = Private(VisFactoryProvider);
   const VegaEditor = Private(VegaEditorProvider);
+  const vegaRequestHandler = Private(VegaRequestHandlerProvider).handler;
 
   // return the visType object, which kibana will use to display and configure new
   // Vis object of this type.
@@ -28,7 +30,7 @@ VisTypesRegistryProvider.register(function VegaVisProvider(Private) {
       }
     },
     editor: VegaEditor,
-    requestHandler: 'none',
+    requestHandler: vegaRequestHandler,
     responseHandler: 'none',
     requiresSearch: false
   });

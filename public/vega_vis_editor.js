@@ -17,6 +17,7 @@ export function VegaEditorProvider($rootScope, $compile, $timeout, getAppState) 
 
       const updateScope = () => {
         $scope.vis = this.vis;
+        $scope.visData = visData;
         $scope.uiState = this.vis.getUiState();
         $scope.$apply();
       };
@@ -28,7 +29,7 @@ export function VegaEditorProvider($rootScope, $compile, $timeout, getAppState) 
           updateScope();
 
           $scope.$watchMulti(
-            ['=vis.params'],
+            ['vis.params'],
             () => {
               const appState = getAppState();
               appState.vis.params = $scope.vis.params;
