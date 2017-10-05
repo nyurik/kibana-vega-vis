@@ -72,18 +72,13 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
         onResize();
       };
 
-      $scope.timefilter = timefilter;
       $scope.$watchMulti(
         [
-          '=vega.vis.params',
-          '=timefilter',
-          { get: dashboardContext, deep: true }
+          'vega.vis.params',
+          'vega.visData'
         ],
         createGraph
       );
-      $scope.$on('courier:searchRefresh', createGraph);
-
-      resizeChecker.on('resize', onResize);
 
       $scope.$on('$destroy', () => {
         this.vegaView.destroy().catch(error => this.onError(error));
