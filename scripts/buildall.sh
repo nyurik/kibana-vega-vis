@@ -17,3 +17,4 @@ build 5.5.2
 build 5.5.3
 build 5.6.0
 build 5.6.1
+build 5.6.2
