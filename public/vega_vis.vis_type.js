@@ -1,41 +1,35 @@
-import { TemplateVisTypeProvider } from 'ui/template_vis_type/template_vis_type';
-
+import { VisFactoryProvider } from 'ui/vis/vis_factory';
+import { CATEGORY } from 'ui/vis/vis_category';
 import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
-import { VisVisTypeProvider } from 'ui/vis/vis_type';
+import { VegaEditorProvider } from './vega_vis_editor';
+import './vega_vis_editor.less';
 
 import './vega_vis.directive';
-import './vega_vis_editor.directive';
 
 import defaultSpec from '!!raw-loader!./default.spec.json';
 
 // register the provider with the visTypes registry
-VisTypesRegistryProvider.register(function MetricVisProvider(Private) {
-  const VisType = Private(VisVisTypeProvider);
-  const TemplateVisType = Private(TemplateVisTypeProvider);
-  // const VisSchemas = Private(VisSchemasProvider);
+VisTypesRegistryProvider.register(function VegaVisProvider(Private) {
+  const VisFactory = Private(VisFactoryProvider);
+  const VegaEditor = Private(VegaEditorProvider);
 
   // return the visType object, which kibana will use to display and configure new
   // Vis object of this type.
-  return new TemplateVisType({
+  return VisFactory.createAngularVisualization({
     name: 'vega',
     title: 'Vega Vis',
-    description: '',
+    description: 'Build Vega and VegaLite data visualizations into Kibana',
     icon: 'fa-code',
-    template: `<vega-vis vis="vis"></vega-vis>`,
-    params: {
+    category: CATEGORY.OTHER,
+    visConfig: {
+      template: `<vega-vis vis="vis"></vega-vis>`,
       defaults: {
         spec: defaultSpec
-      },
-      editor: `<vega-vis-editor
-vis="vis"
-persist-app-state="state.save(true)"
-ui-state="uiState"
-></vega-vis-editor>`
+      }
     },
-    // implementsRenderComplete: true,
-    requiresSearch: false,
-    requiresTimePicker: true,
-    fullEditor: true,
-    category: VisType.CATEGORY.OTHER
+    editor: VegaEditor,
+    requestHandler: 'none',
+    responseHandler: 'none',
+    requiresSearch: false
   });
 });

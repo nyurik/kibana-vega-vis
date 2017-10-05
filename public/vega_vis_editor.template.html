@@ -1,16 +1,16 @@
 <!--TODO: add collapsible-sidebar class (doesn't work in 5.5 with the split.js) -->
-<div class="col-md-5 sidebar-container vegaEditor" style="margin-right: 0;">
+<div class="sidebar-container vegaEditor" style="margin-right: 0;">
   <div class="vegaEditorToolbar">
     <div>Reformat&nbsp;as:</div>
     <button
-      ng-click="vegaEditor.formatHJson()"
+      ng-click="formatHJson()"
       tooltip="Format graph code as HJSON"
       class="kuiButton kuiButton--basic"
     >
       <span>HJSON</span>
     </button>
     <button
-      ng-click="vegaEditor.formatJson()"
+      ng-click="formatJson()"
       tooltip="Format graph code as JSON"
       class="kuiButton kuiButton--basic"
     >
@@ -32,15 +32,15 @@
     mode: 'json'
   }"
     class="vegaEditorSpec"
-    ng-model="vegaEditor.vis.params.spec"
+    ng-model="vis.params.spec"
   ></div>
 </div>
 
 <div class="vegaEditorPreview">
-  <visualize
-    vis="vegaEditor.vis"
-    ui-state="vegaEditor.uiState"
-    show-spy-panel="vegaEditor.shouldShowSpyPanel()"
+  <visualization
+    vis="vis"
+    ui-state="uiState"
+    show-spy-panel="false"
   >
-  </visualize>
+  </visualization>
 </div>
