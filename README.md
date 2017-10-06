@@ -179,6 +179,7 @@ Use browser debugging tools (e.g. F12 or Ctrl+Shift+J in Chrome) to inspect the 
 When using [Vega](https://vega.github.io/vega/examples/) and [VegaLite](https://vega.github.io/vega-lite/examples/) examples, you may need to modify the "data" section to use absolute URL. For example, replace `"url": "data/world-110m.json"` with `"url": "https://vega.github.io/editor/data/world-110m.json"`. Also, regular Vega examples use `"autosize": "pad"` layout model, whereas Kibana plugin uses `fit`. Remove all `autosize`, `width`, and `height` values.  See [sizing and positioning](#sizing-and-positioning) below.
 
 ### Additional configuration options
+These options are specific to this plugin. They control how plugin interprets your Vega spec. [Map support](#vega-with-a-map) has additional configuration options.
 ```yaml
 {
   "_hostConfig": {
