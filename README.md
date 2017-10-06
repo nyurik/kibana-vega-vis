@@ -197,7 +197,7 @@ These options are specific to this plugin. They control how plugin interprets yo
 
 ### Sizing and positioning
 ##### Vega and VegaLite
-By default, Kibana Vega graphs will use `autosize = { type: 'fit', contains: 'padding' }` layout model for Vega and VegaLite graphs. The `fit` model uses all available space, and ignore `width` and `height` values, but respects the padding values. You may override this behaviour by specifying a different `autosize` value.
+By default, Kibana Vega graphs will use `autosize = { type: 'fit', contains: 'padding' }` layout model for Vega and VegaLite graphs. The `fit` model uses all available space, ignores `width` and `height` values, but respects the padding values. You may override this behaviour by specifying a different `autosize` value.
 
 ##### Vega on a map
 All Vega graphs will ignore `autosize`, `width`, `height`, and `padding` values, using `fit` model with zero padding.
