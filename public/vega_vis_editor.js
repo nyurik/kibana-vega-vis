@@ -29,7 +29,7 @@ export function VegaEditorProvider($rootScope, $compile, $timeout, getAppState) 
           updateScope();
 
           $scope.$watchMulti(
-            ['vis.params'],
+            ['=vis.params'],
             () => {
               const appState = getAppState();
               appState.vis.params = $scope.vis.params;
@@ -40,20 +40,20 @@ export function VegaEditorProvider($rootScope, $compile, $timeout, getAppState) 
           $scope.getCodeWidth = () => {
             // TODO: make this dynamic, based on the width of the code window
             return 65;
-          }
+          };
 
           $scope.formatJson = () => {
             $scope._format(compactStringify, {
               maxLength: $scope.getCodeWidth()
             });
-          }
+          };
 
           $scope.formatHJson = () => {
             $scope._format(hjson.stringify, {
               condense: $scope.getCodeWidth(),
               bracesSameLine: true
             });
-          }
+          };
 
           $scope._format = (stringify, opts) => {
             // TODO: error handling and reporting
@@ -64,7 +64,7 @@ export function VegaEditorProvider($rootScope, $compile, $timeout, getAppState) 
               // FIXME!
               alert(err);
             }
-          }
+          };
 
           this.el.html($compile(vegaVisEditorTemplate)($scope));
 
@@ -96,4 +96,4 @@ export function VegaEditorProvider($rootScope, $compile, $timeout, getAppState) 
       }
     }
   };
-};
+}
