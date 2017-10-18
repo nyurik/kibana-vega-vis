@@ -163,10 +163,17 @@ Query may be specified with individual range and dashboard context as well. This
 VegaLite is a simplified version of Vega, useful to quickly get started, but has a number of limitations.  VegaLite is automatically converted into Vega before rendering. Compare [logstash-simple_line-vega](public/examples/logstash/logstash-simple_line-vega.json) and [logstash-simple_line-vegalite](public/examples/logstash/logstash-simple_line-vegalite.json) (both use the same ElasticSearch logstash data). You may use [this editor](https://vega.github.io/editor/) to convert VegaLite into Vega.
 
 # Debugging
+
+## Browser Debugging console
 Use browser debugging tools (e.g. F12 or Ctrl+Shift+J in Chrome) to inspect the `VEGA_DEBUG` variable:
  * `view` - access to the Vega View object. See [Vega Debugging Guide](https://vega.github.io/vega/docs/api/debugging/) on how to inspect data and signals at runtime. For VegaLite, `VEGA_DEBUG.view.data('source_0')` would get the main dataset. For Vega, it uses the data name as defined in your Vega spec.
  * `spec` - Vega JSON specification after some modifications by this plugin. In case of VegaLite, this is the output of the VegaLite compiler. 
  * `vlspec` - If this is a VegaLite graph, JSON specification of the graph before VegaLite compilation.
+
+## Data
+If you are using ElasticSearch query, make sure your resulting data is what you expected. The easiest way to view it is by using "networking" tab in the browser debugging tools (e.g. F12).  Modify the graph slightly so that it makes a search request, and view the response from the server.  Another approach is to use [Kibana Dev Tools](https://www.elastic.co/guide/en/kibana/current/console-kibana.html) tab - place the index name into the first line: `GET <INDEX_NAME>/_search`, and add your query as the following lines (just the value of the `"query"` field)
+
+If you need to share your graph with someone, you may want to copy the raw data response to [gist.github.com](https://gist.github.com/), possibly with a `.json` extension, use the `[raw]` button, and use that url directly in your graph.
 
 # Notes
 
