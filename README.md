@@ -8,12 +8,11 @@
 
 # Quick Demo
 
-* Follow Kibana plugin installation [instructions](https://www.elastic.co/guide/en/kibana/current/_installing_plugins.html). For URL, use a direct download link from the [releases page](https://github.com/nyurik/kibana-vega-vis/releases/latest). Typical command (without spaces):
+* Use a direct download link from the [releases page](https://github.com/nyurik/kibana-vega-vis/releases/latest). _For more info, see [Kibana plugin installation instructions](https://www.elastic.co/guide/en/kibana/current/_installing_plugins.html)_
 ```
 bin/kibana-plugin install \
-   https://github.com/nyurik/kibana-vega-vis/releases/download/  v0.2.0  /vega_vis--  5.5.0  --  0.2.0  .zip
+   https://github.com/nyurik/kibana-vega-vis/releases/download/<latest_version>.zip
 ```
-
 * In Kibana, choose Visualize, and add Vega visualization.
 * You should immediatelly see a default graph
 * Try changing `mark` from `line` to `point`, `area`, `bar`, `circle`, `square`, ... (see [docs](https://vega.github.io/vega-lite/docs/mark.html#mark-def))
