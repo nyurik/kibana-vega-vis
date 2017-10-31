@@ -1,6 +1,6 @@
 {
   "name": "vega_vis",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Build vega visualizations into Kibana",
   "main": "index.js",
   "kibana": {
@@ -50,7 +50,7 @@
     "semver": "^5.4.1",
     "split.js": "^1.3.5",
     "vega": "^3.0.7",
-    "vega-lite": "^2.0.0-rc5",
+    "vega-lite": "^2.0.0",
     "vega-schema-url-parser": "^1.0.0-beta.3"
   }
 }
