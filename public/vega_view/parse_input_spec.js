@@ -20,14 +20,6 @@ export function parseInputSpec(inputSpec, onWarning) {
     spec.$schema = DEFAULT_SCHEMA;
   }
 
-  // FIXME TODO:   remove this switch statement once Vega-lite 2.0 is released
-  switch (spec.$schema) {
-    case 'https://vega.github.io/schema/vega-lite/v2.json':
-    case 'https://vega.github.io/schema/vega-lite/v2.0.json':
-      spec.$schema = 'https://vega.github.io/schema/vega-lite/v2.0.0-beta.json';
-      break;
-  }
-
   const schema = schemaParser(spec.$schema);
   const isVegaLite = schema.library === 'vega-lite';
   const libVersion = isVegaLite ? vegaLite.version : vega.version;
