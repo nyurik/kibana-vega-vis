@@ -123,20 +123,22 @@ export class VegaView {
     const specParams = this._specParams;
     const useDefaultMap = specParams.mapStyle !== false;
 
-    let limits, url, baseLayer;
+    let limits;
+    let url;
+    let baseLayer;
 
     if (useDefaultMap) {
       const tmsService = await this._serviceSettings.getTMSService();
       url = tmsService.getUrl();
       limits = tmsService.getTMSOptions();
     } else {
-      limits = {minZoom: 0, maxZoom: 25};
+      limits = { minZoom: 0, maxZoom: 25 };
     }
 
     // In some cases, Vega may be initialized twice, e.g. after awaiting... TBD
     if (!this._$container) return;
 
-    let validate = (name, value, dflt, min, max) => {
+    const validate = (name, value, dflt, min, max) => {
       if (value === undefined) {
         value = dflt;
       } else if (value < min) {
@@ -157,11 +159,11 @@ export class VegaView {
     }
     const zoom = validate('zoom', specParams.zoom, 2, minZoom, maxZoom);
 
-    let maxBounds = null;
-    if (specParams.maxBounds) {
-      const b = specParams.maxBounds;
-      maxBounds = L.latLngBounds(L.latLng(b[1], b[0]), L.latLng(b[3], b[2]));
-    }
+    // let maxBounds = null;
+    // if (specParams.maxBounds) {
+    //   const b = specParams.maxBounds;
+    //   maxBounds = L.latLngBounds(L.latLng(b[1], b[0]), L.latLng(b[3], b[2]));
+    // }
 
     const map = L.map(this._$container.get(0), {
       minZoom,

@@ -22,7 +22,7 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
           if (typeof args[1] === 'string') {
             value += `\n${args[1]}`;
           } else {
-            value += '\n' + compactStringify(args[1], {maxLength: 70});
+            value += '\n' + compactStringify(args[1], { maxLength: 70 });
           }
         } catch (err) {
           // ignore
@@ -63,7 +63,8 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
           if (this.vegaView) {
             await this.vegaView.destroy();
           }
-          this.vegaView = new VegaView($el, spec, timefilter, dashboardContext, es, serviceSettings, this.onError.bind(this), this.onWarn.bind(this));
+          this.vegaView = new VegaView($el, spec, timefilter, dashboardContext, es, serviceSettings,
+            this.onError.bind(this), this.onWarn.bind(this));
           await this.vegaView.init();
         } catch (error) {
           this.onError(error);

@@ -56,9 +56,9 @@ export function parseInputSpec(inputSpec, onWarning) {
   let maxBounds = hostConfig && hostConfig.maxBounds;
 
   if (!useMap && (
-      mapStyle !== undefined || delayRepaint !== undefined || latitude !== undefined || longitude !== undefined ||
-      zoom !== undefined || minZoom !== undefined || maxZoom !== undefined || zoomControl !== undefined || maxBounds !== undefined
-    )) {
+    mapStyle !== undefined || delayRepaint !== undefined || latitude !== undefined || longitude !== undefined ||
+    zoom !== undefined || minZoom !== undefined || maxZoom !== undefined || zoomControl !== undefined || maxBounds !== undefined
+  )) {
     throw new Error('_hostConfig must have type="map" when used with latitude/longitude/zoom parameters');
   }
 
