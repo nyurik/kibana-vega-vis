@@ -48,7 +48,7 @@ This plugin will automatically inject a projection called `"projection"`. Use it
 # Querying ElasticSearch
 By default, Vega's [data](https://vega.github.io/vega/docs/data/) element can use embedded and external data with a `"url"` parameter. Kibana plugin adds support for the direct ElasticSearch queries by overloading the "url"` value.
 
-Here is an example of an ES query that gets data from `logstash-*` index, filtering by 
+Here is an example of an ES query that gets data from `logstash-*` index.
 
 ```yaml
 {
@@ -75,9 +75,17 @@ Here is an example of an ES query that gets data from `logstash-*` index, filter
             "hist": {
               "date_histogram": {
                 "field": "@timestamp",
-                "interval": "2h",
-                "time_zone": "America/New_York",
-                "min_doc_count": 1
+                // interval value will depend on the daterange picker
+                // Use an integer to set approximate bucket count
+                "interval": {"%autointerval%": true},
+                // Make sure we get an entire range, even if it has no data
+                "extended_bounds": {
+                  "min": {"%timefilter%": "min"},
+                  "max": {"%timefilter%": "max"}
+                },
+                // Use this for linear (e.g. line, area) graphs
+                // Without it, empty buckets will not show up
+                "min_doc_count": 0
               }
             }
           }
@@ -86,11 +94,7 @@ Here is an example of an ES query that gets data from `logstash-*` index, filter
 
       // This is a useful trick to access just the list of aggregation results named "hist"
       //
-      "format": {
-        "type": "json",
-        "property": "aggregations.hist.buckets"
-      },
-
+      "format": { "property": "aggregations.hist.buckets" },
     }
   ],
   ...
@@ -138,11 +142,11 @@ Query may be specified with individual range and dashboard context as well. This
                     // "%timefilter%" will be replaced with the current
                     // values of the time filter (from the upper right corner)
                     "%timefilter%": true
-    
+
                     // Only work with %timefilter%
                     // Shift the current timefilter by 10 units back
                     "shift": 10,
-                    
+
                     // supports week, day (default), hour, minute, second.
                     "unit": "minute"
                   }
@@ -157,6 +161,8 @@ Query may be specified with individual range and dashboard context as well. This
      ...
 ```
 
+The `"%timefilter%"` can also be used to specify a single min or max value. As shown above, the date_histogram's `extended_bounds` can be set with two values - min and max. Instead of hardcoding a value, you may use `"min": {"%timefilter%": "min"}`, which will be replaced with the begining of the current time range. The `shift` and `unit` values are also supported.  The `"interval"` can also be set dynamically, depending on the currently picked range: `"interval": {"%autointerval%": 10}` will try to get about 10-15 datapoints (buckets).
+
 
 # Vega vs VegaLite
 VegaLite is a simplified version of Vega, useful to quickly get started, but has a number of limitations.  VegaLite is automatically converted into Vega before rendering. Compare [logstash-simple_line-vega](public/examples/logstash/logstash-simple_line-vega.json) and [logstash-simple_line-vegalite](public/examples/logstash/logstash-simple_line-vegalite.json) (both use the same ElasticSearch logstash data). You may use [this editor](https://vega.github.io/editor/) to convert VegaLite into Vega.
@@ -166,7 +172,7 @@ VegaLite is a simplified version of Vega, useful to quickly get started, but has
 ## Browser Debugging console
 Use browser debugging tools (e.g. F12 or Ctrl+Shift+J in Chrome) to inspect the `VEGA_DEBUG` variable:
  * `view` - access to the Vega View object. See [Vega Debugging Guide](https://vega.github.io/vega/docs/api/debugging/) on how to inspect data and signals at runtime. For VegaLite, `VEGA_DEBUG.view.data('source_0')` would get the main dataset. For Vega, it uses the data name as defined in your Vega spec.
- * `spec` - Vega JSON specification after some modifications by this plugin. In case of VegaLite, this is the output of the VegaLite compiler. 
+ * `spec` - Vega JSON specification after some modifications by this plugin. In case of VegaLite, this is the output of the VegaLite compiler.
  * `vlspec` - If this is a VegaLite graph, JSON specification of the graph before VegaLite compilation.
 
 ## Data
