@@ -63,7 +63,9 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
           if (this.vegaView) {
             await this.vegaView.destroy();
           }
-          this.vegaView = new VegaView($el, spec, timefilter, dashboardContext, es, serviceSettings,
+
+          const vegaConfig = { enableExternalUrls: true };
+          this.vegaView = new VegaView(vegaConfig, $el, spec, timefilter, dashboardContext, es, serviceSettings,
             this.onError.bind(this), this.onWarn.bind(this));
           await this.vegaView.init();
         } catch (error) {
@@ -73,13 +75,18 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
         onResize();
       };
 
+      $scope.timefilter = timefilter;
       $scope.$watchMulti(
         [
-          'vega.vis.params',
-          'vega.visData'
+          '=vega.vis.params',
+          '=timefilter',
+          'vega.visData',
+          { get: dashboardContext, deep: true }
         ],
         createGraph
       );
+      $scope.$on('courier:searchRefresh', createGraph);
+      // resizeChecker.on('resize', onResize);
 
       $scope.$on('$destroy', () => {
         this.vegaView.destroy().catch(error => this.onError(error));

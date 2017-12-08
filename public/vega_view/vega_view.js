@@ -7,9 +7,14 @@ import * as vegaLite from 'vega-lite';
 import { parseInputSpec } from './parse_input_spec';
 import { createVegaLoader } from './vega_loader';
 
+//https://github.com/elastic/kibana/issues/13327
+vega.scheme('elastic',
+  ['#00B3A4', '#3185FC', '#DB1374', '#490092', '#FEB6DB', '#F98510', '#E6C220', '#BFA180', '#920000', '#461A0A']
+);
+
 // FIXME: handle runtime errors by overrwriting  vega.logging.error ...
 export class VegaView {
-  constructor(parentEl, inputSpec, timefilter, dashboardContext, es, serviceSettings, onError, onWarn) {
+  constructor(vegaConfig, parentEl, inputSpec, timefilter, dashboardContext, es, serviceSettings, onError, onWarn) {
     this._onWarn = onWarn;
     this._onError = onError;
     this._parentEl = parentEl;
@@ -25,7 +30,7 @@ export class VegaView {
     this._view = null;
 
     this._viewConfig = {
-      loader: createVegaLoader(es, timefilter, dashboardContext),
+      loader: createVegaLoader(es, timefilter, dashboardContext, vegaConfig.enableExternalUrls),
       logLevel: vega.Warn,
       renderer: 'canvas',
     };

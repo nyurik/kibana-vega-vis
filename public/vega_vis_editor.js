@@ -12,7 +12,7 @@ export function VegaEditorProvider($rootScope, $compile, $timeout, getAppState) 
       this.vis = vis;
     }
 
-    render(visData, searchSource) {
+    render(visData/*, searchSource*/) {
       let $scope;
 
       const updateScope = () => {
@@ -33,7 +33,7 @@ export function VegaEditorProvider($rootScope, $compile, $timeout, getAppState) 
             () => {
               const appState = getAppState();
               appState.vis.params = $scope.vis.params;
-              appState.save(true)
+              appState.save(true);
             }
           );
 

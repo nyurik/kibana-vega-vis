@@ -6,7 +6,8 @@
 
   // Define the data source
   "data": {
-    // Specifying object as url takes the data from the ES
+    // When url is set to an object instead of a string,
+    // it is treated as an Elasticsearch query.
     // This query counts the number of documents per time interval,
     // assuming you have a @timestamp field in your data
     "url": {

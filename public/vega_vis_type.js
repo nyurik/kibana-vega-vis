@@ -1,11 +1,12 @@
+import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
+
 import { VisFactoryProvider } from 'ui/vis/vis_factory';
 import { CATEGORY } from 'ui/vis/vis_category';
-import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
 import { VegaEditorProvider } from './vega_vis_editor';
 import { VegaRequestHandlerProvider } from './vega_request_handler';
+import './vega_vis.directive';
 import './vega_vis_editor.less';
 
-import './vega_vis.directive';
 
 import defaultSpec from '!!raw-loader!./default.spec.json';
 
@@ -19,8 +20,8 @@ VisTypesRegistryProvider.register(function VegaVisProvider(Private) {
   // Vis object of this type.
   return VisFactory.createAngularVisualization({
     name: 'vega',
-    title: 'Vega Vis',
-    description: 'Build Vega and VegaLite data visualizations into Kibana',
+    title: 'Vega',
+    description: 'Create custom visualizations using Vega and VegaLite',
     icon: 'fa-code',
     category: CATEGORY.OTHER,
     visConfig: {
@@ -32,6 +33,9 @@ VisTypesRegistryProvider.register(function VegaVisProvider(Private) {
     editor: VegaEditor,
     requestHandler: vegaRequestHandler,
     responseHandler: 'none',
-    requiresSearch: false
+    options: {
+      showIndexSelection: false
+    },
+    stage: 'lab',
   });
 });
