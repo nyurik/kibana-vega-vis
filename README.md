@@ -14,7 +14,7 @@ bin/kibana-plugin install \
    https://github.com/nyurik/kibana-vega-vis/releases/download/<latest_version>.zip
 ```
 * In Kibana, choose Visualize, and add Vega visualization.
-* You should immediatelly see a default graph
+* You should immediately see a default graph
 * Try changing `mark` from `line` to `point`, `area`, `bar`, `circle`, `square`, ... (see [docs](https://vega.github.io/vega-lite/docs/mark.html#mark-def))
 * Try other [Vega](https://vega.github.io/vega/examples/) or [VegaLite](https://vega.github.io/vega-lite/examples/) visualizations. You may need to make URLs absolute, e.g. replace `"url": "data/world-110m.json"` with `"url": "https://vega.github.io/editor/data/world-110m.json"`. (see [notes below](#Using Vega and VegaLite examples))
 * Using [makelogs util](https://www.npmjs.com/package/makelogs), generate some logstash data and try [logstash examples](public/examples/logstash), including the [map example](public/examples/logstash/logstash-geosrc-map.json)
@@ -46,7 +46,7 @@ Kibana's default map can be used as a base of the Vega graph. To enable, the gra
 This plugin will automatically inject a projection called `"projection"`. Use it to calculate positioning of all geo-aware marks. Additionally, you may use `latitude`, `longitude`, and `zoom` signals. These signals can be used in the graph, or can be updated to modify the positioning of the map.
 
 # Querying ElasticSearch
-By default, Vega's [data](https://vega.github.io/vega/docs/data/) element can use embedded and external data with a `"url"` parameter. Kibana plugin adds support for the direct ElasticSearch queries by overloading the "url"` value.
+By default, Vega's [data](https://vega.github.io/vega/docs/data/) element can use embedded and external data with a `"url"` parameter. Kibana plugin adds support for the direct ElasticSearch queries by overloading the `"url"` value.
 
 Here is an example of an ES query that gets data from `logstash-*` index.
 
