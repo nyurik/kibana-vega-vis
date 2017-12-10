@@ -58,8 +58,13 @@ export function createVegaLoader(es, timefilter, dashboardContext, enableExterna
             const ctxTag = item === MUST_CLAUSE ? 'must' : 'must_not';
             const ctx = dashboardContext();
             if (ctx && ctx.bool && ctx.bool[ctxTag]) {
-              obj.splice(pos, 1, ...ctx.bool[ctxTag]);  // replace items
-              pos += ctx.bool[ctxTag].length;
+              if (Array.isArray(ctx.bool[ctxTag])) {
+                // replace one value with an array of values
+                obj.splice(pos, 1, ...ctx.bool[ctxTag]);
+                pos += ctx.bool[ctxTag].length;
+              } else {
+                obj[pos++] = ctx.bool[ctxTag];
+              }
             } else {
               obj.splice(pos, 1); // remove item, keep pos at the same position
             }
@@ -95,7 +100,7 @@ export function createVegaLoader(es, timefilter, dashboardContext, enableExterna
               continue;
             case true:
               // Replace {"%timefilter%": true, ...} object with the "range" object
-              createRangeFilter(obj);
+              createRangeFilter(subObj);
               continue;
             case undefined:
               injectQueryContextVars(subObj, isQuery);
