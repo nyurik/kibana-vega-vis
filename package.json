@@ -1,6 +1,6 @@
 {
   "name": "vega_vis",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Build vega visualizations into Kibana",
   "main": "index.js",
   "kibana": {
