@@ -3,14 +3,14 @@
   <div class="vegaEditorToolbar">
     <div>Reformat&nbsp;as:</div>
     <button
-      ng-click="vegaEditor.formatHJson()"
+      ng-click="formatHJson($event)"
       tooltip="Format graph code as HJSON"
       class="kuiButton kuiButton--basic"
     >
       <span>HJSON</span>
     </button>
     <button
-      ng-click="vegaEditor.formatJson()"
+      ng-click="formatJson($event)"
       tooltip="Format graph code as JSON"
       class="kuiButton kuiButton--basic"
     >
@@ -22,15 +22,15 @@
   </div>
   <div
     ui-ace="{
-    useWrapMode: true,
-    advanced: {
-      highlightActiveLine: false
-    },
-    rendererOptions: {
-      showPrintMargin: false
-    },
-    mode: 'json'
-  }"
+      useWrapMode: true,
+      advanced: {
+        highlightActiveLine: false
+      },
+      rendererOptions: {
+        showPrintMargin: false
+      },
+      mode: 'json'
+    }"
     class="vegaEditorSpec"
     ng-model="vegaEditor.vis.params.spec"
   ></div>

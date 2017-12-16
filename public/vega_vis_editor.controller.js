@@ -1,4 +1,5 @@
 import hjson from 'hjson';
+import 'brace/ext/searchbox';
 import compactStringify from 'json-stringify-pretty-compact';
 import split from 'split.js';
 
@@ -22,39 +23,45 @@ export function createVegaVisEditorController(getAppState) {
           appState.save(true)
         }
       );
+
+      $scope.formatJson = (event) => {
+        this._format($scope, event, compactStringify, {
+          maxLength: this._getCodeWidth()
+        });
+      };
+
+      $scope.formatHJson = (event) => {
+        this._format($scope, event, hjson.stringify, {
+          condense: this._getCodeWidth(),
+          bracesSameLine: true,
+          keepWsc: true,
+        });
+      }
+
     }
 
     shouldShowSpyPanel() {
       return false;
     }
 
-    getCodeWidth() {
-      // TODO: make this dynamic, based on the width of the code window
-      return 65;
+    _getCodeWidth() {
+      return 85; // this.aceEditor.getSession().getWrapLimit();
     }
 
-    formatJson() {
-      this._format(compactStringify, {
-        maxLength: this.getCodeWidth()
+    _format($scope, event, stringify, opts) {
+      event.preventDefault();
+
+      // FIXME: is this the right eval method?
+      $scope.$evalAsync(() => {
+        // TODO: error handling and reporting
+        try {
+          const spec = hjson.parse(this.vis.params.spec, { legacyRoot: false, keepWsc: true });
+          this.vis.params.spec = stringify(spec, opts);
+        } catch (err) {
+          // FIXME!
+          alert(err);
+        }
       });
-    }
-
-    formatHJson() {
-      this._format(hjson.stringify, {
-        condense: this.getCodeWidth(),
-        bracesSameLine: true
-      });
-    }
-
-    _format(stringify, opts) {
-      // TODO: error handling and reporting
-      try {
-        const spec = hjson.parse(this.vis.params.spec);
-        this.vis.params.spec = stringify(spec, opts);
-      } catch (err) {
-        // FIXME!
-        alert(err);
-      }
     }
   }
 

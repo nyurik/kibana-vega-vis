@@ -63,13 +63,15 @@ export class VegaView {
     }
   }
 
-  // BUG: FIXME: if this method is called twice without awaiting, the sceond call will return success right away
-  async destroy() {
+  destroy() {
+    // properly handle multiple destroy() calls by converting this._destroyHandlers
+    // from an array into a promise, while handlers are being disposed
     if (this._destroyHandlers) {
-      const handlers = this._destroyHandlers;
-      this._destroyHandlers = null;
-      for (const handler of handlers) {
-        await handler();
+      if (this._destroyHandlers.then) {
+        return this._destroyHandlers;
+      } else {
+        this._destroyHandlers = Promise.all(this._destroyHandlers.map(v => v()));
+        return this._destroyHandlers.then(() => this._destroyHandlers = null);
       }
     }
   }

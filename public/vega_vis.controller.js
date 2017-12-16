@@ -59,7 +59,7 @@ export function createVegaVisController(Private, /*$scope,*/ timefilter, es, ser
         // FIXME!!  need to debounce editor changes
 
         try {
-          const spec = hjson.parse($scope.vega.vis.params.spec);
+          const spec = hjson.parse($scope.vega.vis.params.spec, { legacyRoot: false });
           if (this.vegaView) {
             await this.vegaView.destroy();
           }
