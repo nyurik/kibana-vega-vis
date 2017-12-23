@@ -24,20 +24,22 @@ Kibana's default map can be used as a base of the Vega graph. To enable, the gra
 
 ```yaml
 {
-  "_hostConfig": {
-    "type": "map",
-
-    // Initial map position
-    "latitude": 40.7,      // default 0
-    "longitude": -74,      // default 0
-    "zoom": 7,             // default 2
-    "mapStyle": "default", // defaults to "default", but can also be false to disable base layer
-    "minZoom": 5,          // default 0
-    "maxZoom": 13,         // defaults to the maximum for the given style, or 25 when base is disabled
-    "zoomControl": false,  // defaults to true, shows +/- buttons to zoom in/out
-
-    // When false, repaints on each move frame. Makes the graph slower when moving the map
-    "delayRepaint": true, // default true
+  "config": {
+    "kibana": {
+      "type": "map",
+  
+      // Initial map position
+      "latitude": 40.7,      // default 0
+      "longitude": -74,      // default 0
+      "zoom": 7,             // default 2
+      "mapStyle": "default", // defaults to "default", but can also be false to disable base layer
+      "minZoom": 5,          // default 0
+      "maxZoom": 13,         // defaults to the maximum for the given style, or 25 when base is disabled
+      "zoomControl": false,  // defaults to true, shows +/- buttons to zoom in/out
+  
+      // When false, repaints on each move frame. Makes the graph slower when moving the map
+      "delayRepaint": true, // default true
+    }
   },
   /* the rest of Vega JSON */
 }
@@ -59,9 +61,10 @@ Here is an example of an ES query that gets data from `logstash-*` index.
         // Index name
         "index": "logstash-*",
 
-        // Use current dashboard search string and time range filter with the "@timestamp" field.
-        // Set value to true to ignore the time filter
-        "%context_query%": "@timestamp",
+        // Use current dashboard context (e.g. search string), 
+        // and time range filter with the "@timestamp" field.
+        "%context%": true,
+        "%timefield%": "@timestamp",
 
         // TIP: request can be copied from the debug view of another visualizer
         // You can try this query in Kibana Dev tools (hardcode or remove the `%...%` values first)
@@ -118,7 +121,7 @@ As a result, "myEsDataSource" will be a list of objects. Note that `"key"` is a 
 ]
 ```
 
-Query may be specified with individual range and dashboard context as well. This query is equivalent to `"%context_query%": "@timestamp"`, except that the timerange is shifted back by 10 minutes:
+Query may be specified with individual range and dashboard context as well. This query is equivalent to `"%context%": true, "%timefield%": "@timestamp"`, except that the timerange is shifted back by 10 minutes:
 
 ```yaml
 {
@@ -194,14 +197,16 @@ When using [Vega](https://vega.github.io/vega/examples/) and [VegaLite](https://
 These options are specific to this plugin. They control how plugin interprets your Vega spec. [Map support](#vega-with-a-map) has additional configuration options.
 ```yaml
 {
-  "_hostConfig": {
-    // Placement of the Vega-defined signal bindings.
-    // Can be `left`, `right`, `top`, or `bottom` (default).
-    "controlsLocation": "top",
-    // Can be `vertical` or `horizontal` (default).
-    "controlsDirection": "vertical",
-    // If true, hides most of Vega and VegaLite warnings
-    "hideWarnings": true,
+  "config": {
+    "kibana": {
+      // Placement of the Vega-defined signal bindings.
+      // Can be `left`, `right`, `top`, or `bottom` (default).
+      "controlsLocation": "top",
+      // Can be `vertical` or `horizontal` (default).
+      "controlsDirection": "vertical",
+      // If true, hides most of Vega and VegaLite warnings
+      "hideWarnings": true,
+    }
   },
   /* the rest of Vega JSON */
 }

@@ -1,11 +1,7 @@
 {
   $schema: https://vega.github.io/schema/vega/v3.0.json
-  _hostConfig: {
-    type: map
-    latitude: 10
-    longitude: -5
-    zoom: 2
-    delayRepaint: false
+  config: {
+    kibana: {type: "map", latitude: 10, longitude: -5, zoom: 2, delayRepaint: false}
   }
   data: [
     {
@@ -26,8 +22,8 @@
     }
     {
       name: allCountries
-      url: https://layers.geo.elastic.co/blob/5659313586569216?elastic_tile_service_tos=agree
-      format: {type: "json", property: "features"}
+      url: {%type%: "emsfile", name: "World Countries"}
+      format: {property: "features"}
       transform: [
         {type: "formula", expr: "datum.properties.iso2", as: "countryCode"}
         {
@@ -54,7 +50,8 @@
       name: logCount
       url: {
         index: logstash-*
-        %context_query%: @timestamp
+        %context%: true
+        %timefield%: @timestamp
         body: {
           size: 0
           aggs: {
@@ -69,7 +66,7 @@
           }
         }
       }
-      format: {type: "json", property: "aggregations.countries.buckets"}
+      format: {property: "aggregations.countries.buckets"}
       transform: [
         {
           type: lookup
@@ -112,9 +109,7 @@
       from: {data: "countries"}
       encode: {
         enter: {
-          tooltip: {
-            signal: datum.countryCode + ': ' + format(datum.doc_count, '0,')
-          }
+          tooltip: {signal: "datum.countryCode + ': ' + format(datum.doc_count, '0,')"}
           fillOpacity: {value: 0.7}
         }
         update: {
@@ -146,10 +141,7 @@
           name: selectedDatum
           source: logCount
           transform: [
-            {
-              type: filter
-              expr: hover && datum.key == hover.countryCode && datum.source
-            }
+            {type: "filter", expr: "hover && datum.key == hover.countryCode && datum.source"}
           ]
         }
       ]
@@ -157,11 +149,7 @@
         {
           type: group
           from: {
-            facet: {
-              name: facetedDatum
-              data: selectedDatum
-              field: dest.buckets
-            }
+            facet: {name: "facetedDatum", data: "selectedDatum", field: "dest.buckets"}
           }
           data: [
             {
@@ -217,11 +205,7 @@
                   values: ["rank"]
                   fields: ["key"]
                 }
-                {
-                  type: formula
-                  as: Category
-                  expr: datum.rank < 5 ? datum.key : 'Other'
-                }
+                {type: "formula", as: "Category", expr: "datum.rank < 5 ? datum.key : 'Other'"}
                 {
                   type: aggregate
                   groupby: ["Category"]

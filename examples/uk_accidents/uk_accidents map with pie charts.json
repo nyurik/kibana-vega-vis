@@ -1,11 +1,13 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v3.0.json",
-  "_hostConfig": {
-    "type": "map",
-    "delayRepaint": false,
-    "latitude": 52,
-    "longitude": 0,
-    "zoom": 7
+  "config": {
+    "kibana": {
+      "type": "map",
+      "delayRepaint": false,
+      "latitude": 52,
+      "longitude": 0,
+      "zoom": 7
+    }
   },
   "data": [
     {
@@ -16,9 +18,7 @@
           "size": 0,
           "query": {
             "bool": {
-              "must": [
-                {"range": {"Date": {"%timefilter%": true}}}
-              ]
+              "must": [{"range": {"Date": {"%timefilter%": true}}}]
             }
           },
           "aggs": {
@@ -28,9 +28,7 @@
                 "size": 10
               },
               "aggs": {
-                "center": {
-                  "geo_centroid": {"field": "location"}
-                },
+                "center": {"geo_centroid": {"field": "location"}},
                 "roadtype": {
                   "terms": {
                     "field": "Road_Type.keyword",
@@ -50,10 +48,7 @@
         {
           "type": "geopoint",
           "projection": "projection",
-          "fields": [
-            "center.location.lon",
-            "center.location.lat"
-          ]
+          "fields": ["center.location.lon", "center.location.lat"]
         }
       ]
     }
@@ -68,7 +63,7 @@
     {
       "name": "zoomscale",
       "type": "pow",
-      "domain": [2,18],
+      "domain": [2, 18],
       "range": [1, 3]
     },
     {
@@ -126,9 +121,7 @@
               },
               "stroke": {"value": "#fff"}
             },
-            "update": {
-              "fill": {"scale": "colors", "field": "key"}
-            },
+            "update": {"fill": {"scale": "colors", "field": "key"}},
             "hover": {"fill": {"value": "pink"}}
           }
         }

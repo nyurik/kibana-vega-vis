@@ -8,7 +8,8 @@
       "name": "table",
       "url": {
         "index": "logstash-*",
-        "%context_query%": "@timestamp",
+        "%context%": true,
+        "%timefield%": "@timestamp",
         "body": {
           "size": 0,
           "aggs": {

@@ -1,0 +1,75 @@
+<div class="vegaVisEditor" ng-controller="VegaVisEditorController">
+  <div
+    ui-ace="{
+      onLoad: aceLoaded,
+      useWrapMode: true,
+      advanced: {
+        highlightActiveLine: false
+      },
+      rendererOptions: {
+        showPrintMargin: false
+      },
+      mode: 'hjson'
+    }"
+    id="vegaAceEditor"
+    ng-model="vis.params.spec"
+    data-test-subj="vega-editor"
+  ></div>
+
+  <div id="editor_actions">
+    <span dropdown>
+      <button
+        id="vegaHelp"
+        class="editor_action"
+        dropdown-toggle href="#"
+        aria-label="Vega help"
+      >
+        <span class="kuiIcon fa-question-circle"></span>
+      </button>
+      <ul
+        class="dropdown-menu"
+        role="menu"
+        aria-labelledby="vegaHelp"
+      >
+        <li role="menuitem">
+          <a target="_blank" href="https://github.com/nyurik/kibana-vega-vis#vega-visualization-plugin-for-kibana">
+            Kibana Vega Help
+          </a>
+        </li>
+        <li role="menuitem">
+          <a target="_blank" href="https://vega.github.io/vega-lite/docs/">
+            Vega-Lite Documentation
+          </a>
+        </li>
+        <li role="menuitem">
+          <a target="_blank" href="https://vega.github.io/vega/docs/">
+            Vega Documentation
+          </a>
+        </li>
+      </ul>
+    </span>
+    <span dropdown>
+      <button
+        id="vegaOptions"
+        class="editor_action"
+        dropdown-toggle href="#"
+        aria-label="Vega editor options"
+      >
+        <span class="kuiIcon fa-wrench"></span>
+      </button>
+      <ul
+        class="dropdown-menu"
+        role="menu"
+        aria-labelledby="vegaOptions"
+      >
+        <li role="menuitem">
+          <button ng-click="formatHJson($event)">Reformat as HJSON</button>
+        </li>
+        <li role="menuitem">
+          <button ng-click="formatJson($event)">Reformat as JSON, delete comments</button>
+        </li>
+      </ul>
+    </span>
+  </div>
+
+</div>

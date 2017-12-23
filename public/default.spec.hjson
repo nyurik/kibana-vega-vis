@@ -1,20 +1,32 @@
 {
-  // Use the "reformat" buttons above to remove comments
+  // This graph shows document count in all indexes in the current time range.
+  //
+  // You might need to adjust the time filter in the upper right corner.
+  // Use help icon to view Vega examples, tutorials, and other docs.
+  // Use the wrench icon to reformat and remove comments.
 
   "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
   "title": "Event counts from all indexes",
 
   // Define the data source
   "data": {
-    // When url is set to an object instead of a string,
-    // it is treated as an Elasticsearch query.
-    // This query counts the number of documents per time interval,
-    // assuming you have a @timestamp field in your data
+    // An object instead of a string for the url value
+    // is treated as a context-aware Elasticsearch query.
     "url": {
+      // This query counts the number of documents per time interval,
+      // assuming you have a @timestamp field in your data
+
+      // -- META fields (%) are processed before sending the query to ES
+      // Apply dashboard context filters when set
+      "%context%": true,
+      // Filter the time picker (upper right corner) with this field
+      "%timefield%": "@timestamp",
+
+      // -- The rest of these parameters are submitted to ES. See .search() docs:
+      // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-search
+
       // Which indexes to search
       "index": "_all",
-      // Connect dashboard context (the date range and filters)
-      "%context_query%": "@timestamp",
       // The body element may contain "aggs" and "query" subfields
       "body": {
         "aggs": {
@@ -35,11 +47,11 @@
               "min_doc_count": 0
             }
           }
-        }
-      },
-      // Speed up the response by only including aggregation results
-      "size": 0
-    },
+        },
+        // Speed up the response by only including aggregation results
+        "size": 0
+      }
+    }
     // The full ES result has this structure, but for this graph we only need
     // the list of bucket values, so use format.property:
     // {

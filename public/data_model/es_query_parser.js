@@ -1,54 +1,102 @@
-import * as vega from 'vega';
+import _ from 'lodash';
 
-export function createVegaLoader(es, timefilter, dashboardContext, enableExternalUrls) {
+const TIMEFILTER = '%timefilter%';
+const AUTOINTERVAL = '%autointerval%';
+const MUST_CLAUSE = '%dashboard_context-must_clause%';
+const MUST_NOT_CLAUSE = '%dashboard_context-must_not_clause%';
 
-  const SIMPLE_QUERY = '%context_query%';
-  const TIMEFILTER = '%timefilter%';
-  const AUTOINTERVAL = '%autointerval%';
-  const MUST_CLAUSE = '%dashboard_context-must_clause%';
-  const MUST_NOT_CLAUSE = '%dashboard_context-must_not_clause%';
+// These values may appear in the  'url': { ... }  object
+const LEGACY_CONTEXT = '%context_query%';
+const CONTEXT = '%context%';
+const TIMEFIELD = '%timefield%';
 
-  function queryEsData(uri) {
-    uri.body = uri.body || {};
-    const body = uri.body;
+/**
+ * This class processes all Vega spec customizations,
+ * converting url object parameters into query results.
+ */
+export class EsQueryParser {
 
-    if (uri[SIMPLE_QUERY]) {
-      if (body.query) {
-        throw new Error(`Search request contains both "${SIMPLE_QUERY}" and "body.query" values`);
-      }
+  constructor(timeCache, dashboardContext, onWarning) {
+    this._timeCache = timeCache;
+    this._dashboardContext = dashboardContext;
+    this._onWarning = onWarning;
+  }
 
-      const field = uri[SIMPLE_QUERY];
-      if (field !== true && (typeof field !== 'string' || field.length === 0)) {
-        throw new Error(`"${SIMPLE_QUERY}" can either be true (ignores timefilter), ` +
-          'or it can be the name of the time field, e.g. "@timestamp"');
-      }
-      delete uri[SIMPLE_QUERY];
+  /**
+   * Update request object, expanding any context-aware keywords
+   * @param req
+   */
+  parseEsRequest(req) {
+    let body = req.body;
+    let context = req[CONTEXT];
+    delete req[CONTEXT];
+    let timefield = req[TIMEFIELD];
+    delete req[TIMEFIELD];
+    let usesContext = context !== undefined || timefield !== undefined;
 
-      body.query = dashboardContext();
-
-      if (field !== true) {
-        // Inject range filter based on the timefilter values
-        body.query.bool.must.push({
-          range: {
-            [field]: createRangeFilter({ [TIMEFILTER]: true })
-          }
-        });
-      }
-    } else {
-      injectQueryContextVars(body.query, true);
+    if (body === undefined) {
+      req.body = body = {};
+    } else if (!_.isPlainObject(body)) {
+      throw new Error('url.body must be an object');
     }
 
-    injectQueryContextVars(body.aggs, false);
+    // Migrate legacy %context_query% into context & timefield values
+    const legacyContext = req[LEGACY_CONTEXT];
+    delete req[LEGACY_CONTEXT];
+    if (legacyContext !== undefined) {
+      if (body.query !== undefined) {
+        throw new Error(`Data url must not have legacy "${LEGACY_CONTEXT}" and "body.query" values at the same time`);
+      } else if (usesContext) {
+        throw new Error(`Data url must not have "${LEGACY_CONTEXT}" together with "${CONTEXT}" or "${TIMEFIELD}"`);
+      } else if (legacyContext !== true && (typeof legacyContext !== 'string' || legacyContext.length === 0)) {
+        throw new Error(`Legacy "${LEGACY_CONTEXT}" can either be true (ignores time range picker), ` +
+          'or it can be the name of the time field, e.g. "@timestamp"');
+      }
 
-    return es.search(uri);
+      usesContext = true;
+      context = true;
+      let result = `"url": {"${CONTEXT}": true`;
+      if (typeof legacyContext === 'string') {
+        timefield = legacyContext;
+        result += `, "${TIMEFIELD}": ${JSON.stringify(timefield)}`;
+      }
+      result += '}';
+
+      this._onWarning(
+        `Legacy "url": {"${LEGACY_CONTEXT}": ${JSON.stringify(legacyContext)}} should change to ${result}`);
+    }
+
+    if (body.query !== undefined) {
+      if (usesContext) {
+        throw new Error(`url.${CONTEXT} and url.${TIMEFIELD} must not be used when url.body.query is set`);
+      }
+      this._injectContextVars(body.query, true);
+    } else if (usesContext) {
+
+      if (timefield) {
+        // Inject range filter based on the timefilter values
+        body.query = { range: { [timefield]: this._createRangeFilter({ [TIMEFILTER]: true }) } };
+      }
+
+      if (context) {
+        // Use dashboard context
+        const newQuery = this._dashboardContext();
+        if (timefield) {
+          newQuery.bool.must.push(body.query);
+        }
+        body.query = newQuery;
+      }
+    }
+
+    this._injectContextVars(body.aggs, false);
   }
 
   /**
    * Modify ES request by processing magic keywords
    * @param {*} obj
-   * @param {boolean} isQuery
+   * @param {boolean} isQuery - if true, the `obj` belongs to the req's query portion
    */
-  function injectQueryContextVars(obj, isQuery) {
+  _injectContextVars(obj, isQuery) {
     if (obj && typeof obj === 'object') {
       if (Array.isArray(obj)) {
         // For arrays, replace MUST_CLAUSE and MUST_NOT_CLAUSE string elements
@@ -56,7 +104,7 @@ export function createVegaLoader(es, timefilter, dashboardContext, enableExterna
           const item = obj[pos];
           if (isQuery && (item === MUST_CLAUSE || item === MUST_NOT_CLAUSE)) {
             const ctxTag = item === MUST_CLAUSE ? 'must' : 'must_not';
-            const ctx = dashboardContext();
+            const ctx = this._dashboardContext();
             if (ctx && ctx.bool && ctx.bool[ctxTag]) {
               if (Array.isArray(ctx.bool[ctxTag])) {
                 // replace one value with an array of values
@@ -69,7 +117,7 @@ export function createVegaLoader(es, timefilter, dashboardContext, enableExterna
               obj.splice(pos, 1); // remove item, keep pos at the same position
             }
           } else {
-            injectQueryContextVars(item, isQuery);
+            this._injectContextVars(item, isQuery);
             pos++;
           }
         }
@@ -78,7 +126,8 @@ export function createVegaLoader(es, timefilter, dashboardContext, enableExterna
           const subObj = obj[prop];
           if (!subObj || typeof obj !== 'object') continue;
 
-          // replace "interval": { "%autointerval%": true|integer } with autogenerated range based on the timepicker
+          // replace "interval": { "%autointerval%": true|integer } with
+          // auto-generated range based on the timepicker
           if (prop === 'interval' && subObj[AUTOINTERVAL]) {
             let size = subObj[AUTOINTERVAL];
             if (size === true) {
@@ -86,8 +135,8 @@ export function createVegaLoader(es, timefilter, dashboardContext, enableExterna
             } else if (typeof size !== 'number') {
               throw new Error(`"${AUTOINTERVAL}" must be either true or a number`);
             }
-            const bounds = getTimeRange();
-            obj.interval = roundInterval((bounds.max - bounds.min) / size);
+            const bounds = this._timeCache.getTimeBounds();
+            obj.interval = EsQueryParser._roundInterval((bounds.max - bounds.min) / size);
             continue;
           }
 
@@ -96,14 +145,14 @@ export function createVegaLoader(es, timefilter, dashboardContext, enableExterna
             case 'min':
             case 'max':
               // Replace {"%timefilter%": "min|max", ...} object with a timestamp
-              obj[prop] = getTimeBound(subObj, subObj[TIMEFILTER]);
+              obj[prop] = this._getTimeBound(subObj, subObj[TIMEFILTER]);
               continue;
             case true:
               // Replace {"%timefilter%": true, ...} object with the "range" object
-              createRangeFilter(subObj);
+              this._createRangeFilter(subObj);
               continue;
             case undefined:
-              injectQueryContextVars(subObj, isQuery);
+              this._injectContextVars(subObj, isQuery);
               continue;
             default:
               throw new Error(`"${TIMEFILTER}" property must be set to true, "min", or "max"`);
@@ -118,9 +167,9 @@ export function createVegaLoader(es, timefilter, dashboardContext, enableExterna
    * @param {object} obj
    * @return {object}
    */
-  function createRangeFilter(obj) {
-    obj.gte = getTimeBound(obj, 'min');
-    obj.lte = getTimeBound(obj, 'max');
+  _createRangeFilter(obj) {
+    obj.gte = this._getTimeBound(obj, 'min');
+    obj.lte = this._getTimeBound(obj, 'max');
     obj.format = 'epoch_millis';
     delete obj[TIMEFILTER];
     delete obj.shift;
@@ -128,8 +177,16 @@ export function createVegaLoader(es, timefilter, dashboardContext, enableExterna
     return obj;
   }
 
-  function getTimeBound(opts, type) {
-    const bounds = getTimeRange();
+  /**
+   *
+   * @param {object} opts
+   * @param {number} [opts.shift]
+   * @param {string} [opts.unit]
+   * @param {'min'|'max'} type
+   * @returns {*}
+   */
+  _getTimeBound(opts, type) {
+    const bounds = this._timeCache.getTimeBounds();
     let result = bounds[type];
 
     if (opts.shift) {
@@ -167,12 +224,13 @@ export function createVegaLoader(es, timefilter, dashboardContext, enableExterna
 
     return result;
   }
+
   /**
    * Adapted from src/core_plugins/timelion/common/lib/calculate_interval.js
    * @param interval (ms)
    * @returns {string}
    */
-  function roundInterval(interval) {
+  static _roundInterval(interval) {
     switch (true) {
       case (interval <= 500):         // <= 0.5s
         return '100ms';
@@ -209,41 +267,4 @@ export function createVegaLoader(es, timefilter, dashboardContext, enableExterna
     }
   }
 
-  let _timeBounds;
-  function getTimeRange() {
-    // Caching function
-    if (_timeBounds) return _timeBounds;
-    const bounds = timefilter.getBounds();
-    _timeBounds = {
-      min: bounds.min.valueOf(),
-      max: bounds.max.valueOf()
-    };
-    return _timeBounds;
-  }
-
-  /**
-   * ... the loader instance to use for data file loading. A
-   * loader object must provide a "load" method for loading files and a
-   * "sanitize" method for checking URL/filename validity. Both methods
-   * should accept a URI and options hash as arguments, and return a Promise
-   * that resolves to the loaded file contents (load) or a hash containing
-   * sanitized URI data with the sanitized url assigned to the "href" property
-   * (sanitize).
-   */
-  const loader = vega.loader();
-  const defaultLoad = loader.load.bind(loader);
-  loader.load = (uri, opts) => {
-    if (typeof uri === 'object') {
-      switch (opts.context) {
-        case 'dataflow':
-          return queryEsData(uri);
-      }
-      throw new Error('Unexpected url object');
-    } else if (!enableExternalUrls) {
-      throw new Error('External URLs have been disabled in kibana.yml');
-    }
-    return defaultLoad(uri, opts);
-  };
-
-  return loader;
 }

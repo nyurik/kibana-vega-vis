@@ -1,0 +1,79 @@
+{
+  $schema: https://vega.github.io/schema/vega/v3.0.json
+  config: {
+    kibana: {
+      type: map
+      latitude: 10
+      longitude: -5
+      zoom: 2
+    }
+  }
+  data: [
+    {
+      name: logCount
+      url: {
+        %context%: true
+        %timefield%: @timestamp
+        index: logstash-*
+        body: {
+            size: 0
+            aggs: {
+              countries: {
+                terms: {field: "geo.src", size: 200}
+              }
+            }
+        }
+      }
+      format: {
+        property: aggregations.countries.buckets
+      }
+    }
+    {
+      name: countries
+      url: {%type%: "emsfile", name: "World Countries"}
+      format: {type: "json", property: "features"}
+      transform: [
+        {
+          type: lookup
+          from: logCount
+          key: key
+          fields: ["properties.iso2"]
+          values: ["doc_count"]
+        }
+        {
+          type: filter
+          expr: datum.doc_count != null
+        }
+      ]
+    }
+  ]
+  scales: [
+    {
+      name: color
+      type: sqrt
+      domain: {data: "countries", field: "doc_count"}
+      range: {scheme: "Greens"}
+    }
+  ]
+  marks: [
+    {
+      type: shape
+      from: {data: "countries"}
+      encode: {
+        enter: {
+          tooltip: {signal: "format(datum.doc_count, '0,')"}
+          fillOpacity: {value: 0.7}
+        }
+        update: {
+          fill: {scale: "color", field: "doc_count"}
+        }
+        hover: {
+          fill: {value: "red"}
+        }
+      }
+      transform: [
+        {type: "geoshape", projection: "projection"}
+      ]
+    }
+  ]
+}

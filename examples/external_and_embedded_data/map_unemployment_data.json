@@ -1,13 +1,15 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v3.0.json",
-  "_hostConfig": {
-    "type": "map",
-    "delayRepaint": false,
-    "latitude": 41,
-    "longitude": -74,
-    "zoom": 4,
-    "controlsLocation": "top",
-    "controlsDirection": "horizontal"
+  "config": {
+    "kibana": {
+      "type": "map",
+      "delayRepaint": false,
+      "latitude": 41,
+      "longitude": -74,
+      "zoom": 4,
+      "controlsLocation": "top",
+      "controlsDirection": "horizontal"
+    }
   },
   "signals": [
     {
