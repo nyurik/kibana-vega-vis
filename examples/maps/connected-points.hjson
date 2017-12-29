@@ -1,0 +1,91 @@
+//
+// Simple map with lines connecting point pairs
+//
+{
+  $schema: https://vega.github.io/schema/vega/v3.0.json
+  _hostConfig: {type: "map", latitude: 10, longitude: -5, zoom: 2}
+  data: [
+    {
+      // List of destination points
+      // initially in latitude/longitude,
+      // transformed into X,Y coordinates
+      name: nodes
+      values: [
+        {id: "US", lon: -101, lat: 40}
+        {id: "BR", lon: -55, lat: -9}
+        {id: "FR", lon: 2, lat: 47}
+        {id: "CN", lon: 104, lat: 36}
+      ]
+      transform: [
+        {
+          type: geopoint
+          projection: projection
+          fields: ["lon", "lat"]
+        }
+      ]
+    }
+    {
+      // List of edges
+      // use nodes source to lookup each node coordinates
+      // and create "linkpaths" for each pair
+      name: edges
+      values: [
+        {s: "US", t: "CN"}
+        {s: "FR", t: "BR"}
+      ]
+      transform: [
+        {
+          type: lookup
+          from: nodes
+          key: id
+          fields: ["s", "t"]
+          as: ["source", "target"]
+        }
+        {
+          type: linkpath
+          sourceX: source.x
+          sourceY: source.y
+          targetX: target.x
+          targetY: target.y
+          orient: {signal: "orient"}
+          shape: {signal: "shape"}
+        }
+      ]
+    }
+  ]
+  marks: [
+    {
+      // Draws each edge with the given color/thickness
+      type: path
+      from: {data: "edges"}
+      encode: {
+        update: {
+          stroke: {value: "#00f"}
+          strokeWidth: {value: 5}
+          path: {field: "path"}
+        }
+      }
+    }
+  ]
+  signals: [
+    // Lets us experiment with the different line options
+    // at the bottom of the map.  We can hardcode these values
+    // e.g. by replacing {signal: "orient"} with "orient"
+    {
+      name: orient
+      value: vertical
+      bind: {
+        input: select
+        options: ["vertical", "horizontal", "radial"]
+      }
+    }
+    {
+      name: shape
+      value: diagonal
+      bind: {
+        input: select
+        options: ["line", "arc", "curve", "diagonal", "orthogonal"]
+      }
+    }
+  ]
+}
