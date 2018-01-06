@@ -8,16 +8,16 @@
 
 # Quick Demo
 
-* Use a direct download link from the [releases page](https://github.com/nyurik/kibana-vega-vis/releases/latest). _For more info, see [Kibana plugin installation instructions](https://www.elastic.co/guide/en/kibana/current/_installing_plugins.html)_
+* Use a direct download link from the [releases page](https://github.com/nyurik/kibana-vega-vis/releases/latest). Make sure you get the right version to match your Kibana version, or it won't work! _For more info, see [Kibana plugin installation instructions](https://www.elastic.co/guide/en/kibana/current/_installing_plugins.html)_
 ```
 bin/kibana-plugin install \
    https://github.com/nyurik/kibana-vega-vis/releases/download/<latest_version>.zip
 ```
 * In Kibana, choose Visualize, and add Vega visualization.
-* You should immediately see a default graph
+* You should immediately see a default graph. If you do not have any time-based data in your ElasticSearch, you can generate some random logstash data using [makelogs util](https://www.npmjs.com/package/makelogs) (not on production cluster!). Also, make sure your time filter gets enough data in the upper right corner.
 * Try changing `mark` from `line` to `point`, `area`, `bar`, `circle`, `square`, ... (see [docs](https://vega.github.io/vega-lite/docs/mark.html#mark-def))
+* Try other [logstash examples](public/examples/logstash), including the [map example](public/examples/logstash/logstash-geosrc-map-with-destinations.hjson)
 * Try other [Vega](https://vega.github.io/vega/examples/) or [VegaLite](https://vega.github.io/vega-lite/examples/) visualizations. You may need to make URLs absolute, e.g. replace `"url": "data/world-110m.json"` with `"url": "https://vega.github.io/editor/data/world-110m.json"`. (see [notes below](#Using Vega and VegaLite examples))
-* Using [makelogs util](https://www.npmjs.com/package/makelogs), generate some logstash data and try [logstash examples](public/examples/logstash), including the [map example](public/examples/logstash/logstash-geosrc-map.json)
 
 # Vega with a map
 Kibana's default map can be used as a base of the Vega graph. To enable, the graph must specify `type=map` in the host configuration:
