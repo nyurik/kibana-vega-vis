@@ -4,6 +4,7 @@ import { VegaMapView } from './vega_view/vega_map_view';
 
 export function VegaVisualizationProvider(vegavisConfig, serviceSettings) {
 
+  const vegaConfig = vegavisConfig;
   const notify = new Notifier({ location: 'Vega' });
 
   return class VegaVisualization {
@@ -47,9 +48,9 @@ export function VegaVisualizationProvider(vegavisConfig, serviceSettings) {
         }
 
         if (vegaParser.useMap) {
-          this._vegaView = new VegaMapView(vegavisConfig, this._el, vegaParser, serviceSettings);
+          this._vegaView = new VegaMapView(vegaConfig, this._el, vegaParser, serviceSettings);
         } else {
-          this._vegaView = new VegaView(vegavisConfig, this._el, vegaParser, serviceSettings);
+          this._vegaView = new VegaView(vegaConfig, this._el, vegaParser, serviceSettings);
         }
         await this._vegaView.init();
 
