@@ -1,0 +1,156 @@
+{
+  $schema: https://vega.github.io/schema/vega/v3.0.json
+  config: {
+    kibana: {type: "map", latitude: 60, longitude: -98, zoom: 3, delayRepaint: false}
+  }
+  data: [
+    {
+      name: shapes
+      url: {
+        %type%: url
+        url: https://sophox.org/regions/topojson.json
+        query: {
+          sparql:
+            '''
+            #defaultView:MapRegions
+            SELECT
+              ?id
+              (SAMPLE(?label) as ?label)
+              (SAMPLE(?iso_3166_2) as ?iso_3166_2)
+              (SAMPLE(?head_of_govt_label) as ?head_of_govt)
+              (SAMPLE(?flag_image) as ?flag_image)
+
+            WHERE {
+              # You can put several space-separated entries inside the curly braces
+              # E.g. type  wd:  and hit Ctrl+Space to use autocomplete
+              VALUES ?entity { wd:Q16 }
+
+              # P150 = "contains administrative territorial entity"
+              # but must not have a P582 (end date) qualifier
+              ?entity p:P150 ?statement .
+              ?statement ps:P150 ?id .
+              FILTER NOT EXISTS { ?statement pq:P582 ?x }
+
+              OPTIONAL { ?id rdfs:label ?label . FILTER(LANG(?label) = "en") }
+              OPTIONAL { ?id wdt:P300 ?iso_3166_2 }
+              OPTIONAL { ?id wdt:P41 ?flag_image }
+              OPTIONAL {
+                ?id wdt:P6 ?head_of_govt .
+                SERVICE wikibase:label {
+                  bd:serviceParam wikibase:language "ru,en" .
+                  ?head_of_govt rdfs:label ?head_of_govt_label .
+                }
+              }
+            }
+            # remove possible duplicates
+            GROUP BY ?id
+            '''
+        }
+      }
+      format: {type: "topojson", feature: "data"}
+      transform: [
+        {type: "formula", expr: "round(random()*100000)", as: "randValue"}
+      ]
+    }
+  ]
+  scales: [
+    {
+      name: color
+      type: sqrt
+      domain: {data: "shapes", field: "randValue"}
+      range: {scheme: "GreenBlue"}
+    }
+  ]
+  marks: [
+    {
+      name: countrymark
+      type: shape
+      from: {data: "shapes"}
+      encode: {
+        enter: {
+          tooltip: {signal: "datum.properties.label + ': ' + format(datum.randValue, '0,')"}
+          fillOpacity: {value: 0.7}
+        }
+        update: {
+          fill: {scale: "color", field: "randValue"}
+        }
+        hover: {
+          fill: {value: "red"}
+        }
+      }
+      transform: [
+        {type: "geoshape", projection: "projection"}
+      ]
+    }
+    {
+      type: group
+      data: [
+        {
+          name: selectedDatum
+          values: [
+            {}
+          ]
+          transform: [
+            {type: "filter", expr: "hover"}
+            {type: "formula", expr: "hover.properties.label", as: "label"}
+            {type: "formula", expr: "hover.properties.flag_image", as: "flagImg"}
+          ]
+        }
+      ]
+      interactive: false
+      marks: [
+        {
+          type: rect
+          from: {data: "selectedDatum"}
+          encode: {
+            update: {
+              height: {value: 128}
+              width: {value: 180}
+              xc: {value: 135}
+              y: {value: 10}
+              stroke: {value: "#fff"}
+              fill: {value: "#fff"}
+              fillOpacity: {value: 0.5}
+            }
+          }
+        }
+        {
+          type: text
+          from: {data: "selectedDatum"}
+          encode: {
+            enter: {
+              xc: {value: 134}
+              y: {value: 23}
+              align: {value: "center"}
+              text: {field: "label"}
+            }
+          }
+        }
+        {
+          type: image
+          from: {data: "selectedDatum"}
+          interactive: false
+          encode: {
+            enter: {
+              url: {field: "flagImg"}
+              xc: {value: 135}
+              yc: {value: 82}
+              width: {value: 200}
+              height: {value: 100}
+            }
+          }
+        }
+      ]
+    }
+  ]
+  signals: [
+    {
+      name: hover
+      value: null
+      on: [
+        {events: "@countrymark:mouseover", update: "datum"}
+        {events: "@countrymark:mouseout", update: "null"}
+      ]
+    }
+  ]
+}
