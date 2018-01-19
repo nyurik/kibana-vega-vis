@@ -48,9 +48,9 @@ export function VegaVisualizationProvider(vegavisConfig, serviceSettings) {
         }
 
         if (vegaParser.useMap) {
-          this._vegaView = new VegaMapView(vegaConfig, this._el, vegaParser, serviceSettings);
+          this._vegaView = new VegaMapView(vegaConfig, this._vis.editorMode, this._el, vegaParser, serviceSettings);
         } else {
-          this._vegaView = new VegaView(vegaConfig, this._el, vegaParser, serviceSettings);
+          this._vegaView = new VegaView(vegaConfig, this._vis.editorMode, this._el, vegaParser, serviceSettings);
         }
         await this._vegaView.init();
 

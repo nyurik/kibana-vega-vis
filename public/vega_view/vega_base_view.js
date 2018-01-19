@@ -9,8 +9,9 @@ vega.scheme('elastic',
 );
 
 export class VegaBaseView {
-  constructor(vegaConfig, parentEl, vegaParser, serviceSettings) {
+  constructor(vegaConfig, editorMode, parentEl, vegaParser, serviceSettings) {
     this._vegaConfig = vegaConfig;
+    this._editorMode = editorMode;
     this._$parentEl = $(parentEl);
     this._parser = vegaParser;
     this._serviceSettings = serviceSettings;
@@ -123,40 +124,57 @@ export class VegaBaseView {
   /**
    * Set global debug variable to simplify vega debugging in console. Show info message first time
    */
-  static setDebugValues(view, spec, vlspec) {
+  setDebugValues(view, spec, vlspec) {
+    if (!this._editorMode) {
+      // VEGA_DEBUG should only be enabled in the editor mode
+      return;
+    }
+
     if (window) {
       if (window.VEGA_DEBUG === undefined && console) {
         console.log('%cWelcome to Kibana Vega Plugin!', 'font-size: 16px; font-weight: bold;');
-        console.log('You can access the Vega view with VEGA_DEBUG. Learn more at https://vega.github.io/vega/docs/api/debugging/.');
+        console.log('You can access the Vega view with VEGA_DEBUG. ' +
+          'Learn more at https://vega.github.io/vega/docs/api/debugging/.');
       }
 
-      window.VEGA_DEBUG = window.VEGA_DEBUG || {};
+      const debugObj = {};
+      window.VEGA_DEBUG = debugObj;
       window.VEGA_DEBUG.VEGA_VERSION = vega.version;
       window.VEGA_DEBUG.VEGA_LITE_VERSION = vegaLite.version;
       window.VEGA_DEBUG.view = view;
       window.VEGA_DEBUG.vega_spec = spec;
       window.VEGA_DEBUG.vegalite_spec = vlspec;
+
+      // On dispose, clean up, but don't use undefined to prevent repeated debug statements
+      this._addDestroyHandler(() => {
+        if (debugObj === window.VEGA_DEBUG) {
+          window.VEGA_DEBUG = null;
+        }
+      });
     }
   }
 
   destroy() {
     // properly handle multiple destroy() calls by converting this._destroyHandlers
-    // from an array into a promise, while handlers are being disposed
+    // into the _ongoingDestroy promise, while handlers are being disposed
     if (this._destroyHandlers) {
-      if (this._destroyHandlers.then) {
-        return this._destroyHandlers;
-      } else {
-        this._destroyHandlers = Promise.all(this._destroyHandlers.map(v => v()));
-        return this._destroyHandlers.then(() => this._destroyHandlers = null);
-      }
+      // If no destroy is yet running, execute all handlers and wait for all of them to resolve.
+      this._ongoingDestroy = Promise.all(this._destroyHandlers.map(v => v()));
+      this._destroyHandlers = null;
     }
+    return this._ongoingDestroy;
   }
 
   _addDestroyHandler(handler) {
+    // If disposing hasn't started yet, enqueue it, otherwise dispose right away
+    // This creates a minor issue - if disposing has started but not yet finished,
+    // and we dispose the new handler right away, the destroy() does not wait for it.
+    // This behavior is no different from the case when disposing has already completed,
+    // so it shouldn't create any issues.
     if (this._destroyHandlers) {
       this._destroyHandlers.push(handler);
     } else {
-      handler(); // When adding a handled after disposing, dispose it right away
+      handler();
     }
   }
 }

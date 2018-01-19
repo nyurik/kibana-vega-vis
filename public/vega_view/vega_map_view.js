@@ -86,7 +86,7 @@ export class VegaMapView extends VegaBaseView {
       })
       .addTo(map);
 
-    VegaBaseView.setDebugValues(vegaLayer._view, vegaLayer._spec);
+    this.setDebugValues(vegaLayer._view, vegaLayer._spec);
 
     this._addDestroyHandler(() => {
       map.removeLayer(vegaLayer);

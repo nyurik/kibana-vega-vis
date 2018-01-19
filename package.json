@@ -1,6 +1,6 @@
 {
   "name": "vega_vis",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Build vega visualizations into Kibana",
   "main": "index.js",
   "kibana": {
@@ -8,9 +8,9 @@
   },
   "repository": "nyurik/kibana-vega-vis",
   "license": "Apache-2.0",
+  "author": "Yuri Astrakhan <YuriAstrakhan@gmail.com>",
   "contributors": [
     "Spencer Alger <spencer.alger@elastic.co>",
-    "Yuri Astrakhan <YuriAstrakhan@gmail.com>",
     "Nathan Reese <reese.nathan@gmail.com>"
   ],
   "keywords": [
@@ -48,10 +48,9 @@
     "json-stringify-pretty-compact": "^1.0.4",
     "leaflet-vega": "^0.5.4",
     "raw-loader": "^0.5.1",
-    "split.js": "^1.3.5",
-    "vega": "^3.0.8",
-    "vega-lite": "^2.0.3",
+    "vega": "^3.0.9",
+    "vega-lite": "^2.0.4",
     "vega-schema-url-parser": "^1.0.0",
-    "semver": "^5.4.1"
+    "semver": "^5.5.0"
   }
 }
