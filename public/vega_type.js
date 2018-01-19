@@ -1,7 +1,6 @@
 import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
 import { VisFactoryProvider } from 'ui/vis/vis_factory';
 import { CATEGORY } from 'ui/vis/vis_category';
-import { DefaultEditorSize } from 'ui/vis/editor_size';
 
 import { VegaRequestHandlerProvider } from './vega_request_handler';
 import { VegaVisualizationProvider } from './vega_visualization';
@@ -35,7 +34,7 @@ VisTypesRegistryProvider.register((Private) => {
     editorConfig: {
       optionsTemplate: vegaEditorTemplate,
       enableAutoApply: true,
-      defaultSize: DefaultEditorSize.MEDIUM,
+      defaultSize: 'medium', // backward compatible when ui/public/vis/editor_size is missing
     },
     visualization: VegaVisualization,
     requestHandler: vegaRequestHandler,

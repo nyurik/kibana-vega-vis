@@ -3,7 +3,8 @@ import hjson from 'hjson';
 import { Notifier } from 'ui/notify';
 import { uiModules } from 'ui/modules';
 
-import 'ui/accessibility/kbn_ui_ace_keyboard_mode';
+// Not available in 6.0.1
+// import 'ui/accessibility/kbn_ui_ace_keyboard_mode';
 
 const module = uiModules.get('kibana/vega_vis', ['kibana']);
 module.controller('VegaVisEditorController', ($scope /*, kbnUiAceKeyboardModeService*/) => {
