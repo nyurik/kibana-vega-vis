@@ -44,12 +44,12 @@
   },
   "dependencies": {
     "compare-versions": "^3.1.0",
-    "hjson": "^3.1.0",
-    "json-stringify-pretty-compact": "^1.0.4",
+    "hjson": "^3.1.1",
+    "json-stringify-pretty-compact": "^1.1.0",
     "leaflet-vega": "^0.5.4",
     "raw-loader": "^0.5.1",
-    "vega": "^3.0.9",
-    "vega-lite": "^2.0.4",
+    "vega": "^3.0.10",
+    "vega-lite": "^2.1.2",
     "vega-schema-url-parser": "^1.0.0",
     "semver": "^5.5.0"
   }
