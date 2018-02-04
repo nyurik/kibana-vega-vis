@@ -138,20 +138,22 @@ Query may be specified with individual range and dashboard context as well. This
               "must": [
                 // This string will be replaced with the auto-generated "MUST" clause
                 "%dashboard_context-must_clause%",
+                
+                // apply timefilter (upper right corner) to the @timestamp variable
+                {
+                  "range": {
+                    "@timestamp": {
+                      // "%timefilter%" will be replaced with the current
+                      // values of the time filter (from the upper right corner)
+                      "%timefilter%": true
 
-                "range": {
-                  // apply timefilter (upper right corner) to the @timestamp variable
-                  "@timestamp": {
-                    // "%timefilter%" will be replaced with the current
-                    // values of the time filter (from the upper right corner)
-                    "%timefilter%": true
+                      // Only work with %timefilter%
+                      // Shift the current timefilter by 10 units back
+                      "shift": 10,
 
-                    // Only work with %timefilter%
-                    // Shift the current timefilter by 10 units back
-                    "shift": 10,
-
-                    // supports week, day (default), hour, minute, second.
-                    "unit": "minute"
+                      // supports week, day (default), hour, minute, second.
+                      "unit": "minute"
+                    }
                   }
                 }
               ],
