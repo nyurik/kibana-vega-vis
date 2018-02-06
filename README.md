@@ -3,7 +3,7 @@
 > Build [Vega](https://vega.github.io/vega/examples/) and [Vega-Lite](https://vega.github.io/vega-lite/examples/) data visualizations into Kibana, either standalone, or on top of a map.
 
 # Watch a short introduction video
-[![Leaflet Vega layer demo](https://i.ytimg.com/vi_webp/lQGCipY3th8/maxresdefault.webp)](https://www.youtube.com/watch?v=lQGCipY3th8)
+[![Kibana Vega plugin demo](https://i.ytimg.com/vi_webp/lQGCipY3th8/maxresdefault.webp)](https://www.youtube.com/watch?v=lQGCipY3th8)
 
 
 # Quick Demo
@@ -27,7 +27,7 @@ Kibana's default map can be used as a base of the Vega graph. To enable, the gra
   "config": {
     "kibana": {
       "type": "map",
-  
+
       // Initial map position
       "latitude": 40.7,      // default 0
       "longitude": -74,      // default 0
@@ -36,7 +36,7 @@ Kibana's default map can be used as a base of the Vega graph. To enable, the gra
       "minZoom": 5,          // default 0
       "maxZoom": 13,         // defaults to the maximum for the given style, or 25 when base is disabled
       "zoomControl": false,  // defaults to true, shows +/- buttons to zoom in/out
-  
+
       // When false, repaints on each move frame. Makes the graph slower when moving the map
       "delayRepaint": true, // default true
     }
@@ -61,7 +61,7 @@ Here is an example of an ES query that gets data from `logstash-*` index.
         // Index name
         "index": "logstash-*",
 
-        // Use current dashboard context (e.g. search string), 
+        // Use current dashboard context (e.g. search string),
         // and time range filter with the "@timestamp" field.
         "%context%": true,
         "%timefield%": "@timestamp",
@@ -138,7 +138,7 @@ Query may be specified with individual range and dashboard context as well. This
               "must": [
                 // This string will be replaced with the auto-generated "MUST" clause
                 "%dashboard_context-must_clause%",
-                
+
                 // apply timefilter (upper right corner) to the @timestamp variable
                 {
                   "range": {
@@ -216,10 +216,10 @@ These options are specific to this plugin. They control how plugin interprets yo
 
 ### Sizing and positioning
 ##### Vega and Vega-Lite
-By default, Kibana Vega graphs will use `autosize = { type: 'fit', contains: 'padding' }` layout model for Vega and Vega-Lite graphs. The `fit` model uses all available space, ignores `width` and `height` values, but respects the padding values. You may override this behaviour by specifying a different `autosize` value.
+By default, Kibana Vega graphs will use `autosize = { type: 'fit', contains: 'padding' }` layout model for Vega and Vega-Lite graphs. The `fit` model uses all available space, ignores `width` and `height` values, but respects the padding values. You may override this behavior by specifying a different `autosize` value.
 
 ##### Vega on a map
-All Vega graphs will ignore `autosize`, `width`, `height`, and `padding` values, using `fit` model with zero padding.
+All Vega and Vega-Lite graphs will ignore `autosize`, `width`, `height`, and `padding` values, using `fit` model with zero padding.
 
 
 ## Development
