@@ -2,6 +2,8 @@
 
 > Build [Vega](https://vega.github.io/vega/examples/) and [Vega-Lite](https://vega.github.io/vega-lite/examples/) data visualizations into Kibana, either standalone, or on top of a map.
 
+_Kibana 6.2 includes this plugin without the leaflet (`type=map`) support._
+
 # Watch a short introduction video
 [![Kibana Vega plugin demo](https://i.ytimg.com/vi_webp/lQGCipY3th8/maxresdefault.webp)](https://www.youtube.com/watch?v=lQGCipY3th8)
 
