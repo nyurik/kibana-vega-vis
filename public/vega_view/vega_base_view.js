@@ -48,10 +48,14 @@ export class VegaBaseView {
         .appendTo(this._$parentEl);
 
       this._addDestroyHandler(() => {
-        this._$container.remove();
-        this._$container = null;
-        this._$controls.remove();
-        this._$controls = null;
+        if (this._$container) {
+          this._$container.remove();
+          this._$container = null;
+        }
+        if (this._$controls) {
+          this._$controls.remove();
+          this._$controls = null;
+        }
         if (this._$messages) {
           this._$messages.remove();
           this._$messages = null;
@@ -136,7 +140,6 @@ export class VegaBaseView {
         console.log('You can access the Vega view with VEGA_DEBUG. ' +
           'Learn more at https://vega.github.io/vega/docs/api/debugging/.');
       }
-
       const debugObj = {};
       window.VEGA_DEBUG = debugObj;
       window.VEGA_DEBUG.VEGA_VERSION = vega.version;
