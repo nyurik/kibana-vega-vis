@@ -1,6 +1,6 @@
 {
   "name": "vega_vis",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Build vega visualizations into Kibana",
   "main": "index.js",
   "kibana": {
@@ -48,8 +48,8 @@
     "json-stringify-pretty-compact": "^1.1.0",
     "leaflet-vega": "^0.6.1",
     "raw-loader": "^0.5.1",
-    "vega-lib": "^3.0.10",
-    "vega-lite": "^2.1.2",
+    "vega-lib": "^3.2.1",
+    "vega-lite": "^2.3.1",
     "vega-schema-url-parser": "^1.0.0",
     "semver": "^5.5.0"
   }

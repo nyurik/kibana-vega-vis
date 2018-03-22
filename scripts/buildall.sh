@@ -11,6 +11,7 @@ function build {
     done
 }
 
+build 6.0.0
 build 6.0.1
 build 6.1.0
 build 6.1.1
