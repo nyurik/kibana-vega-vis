@@ -7,21 +7,23 @@ export class VegaMapView extends VegaBaseView {
 
   async _initViewCustomizations() {
     const mapConfig = this._parser.mapConfig;
-    const useDefaultMap = mapConfig.mapStyle !== false;
-
-    let limits;
-    let url;
+    let baseMapOpts;
     let baseLayer;
+    let limitMinZ = 0;
+    let limitMaxZ = 25;
 
-    if (useDefaultMap) {
-      const tmsService = await this._serviceSettings.getTMSService();
-      // FIXME: In some cases, Vega may be initialized twice, e.g. after awaiting... TBD
+    if (mapConfig.mapStyle !== false) {
+      const tmsServices = await this._serviceSettings.getTMSServices();
+      // In some cases, Vega may be initialized twice, e.g. after awaiting...
       if (!this._$container) return;
-
-      url = tmsService.getUrl();
-      limits = tmsService.getTMSOptions();
-    } else {
-      limits = { minZoom: 0, maxZoom: 25 };
+      const mapStyle = mapConfig.mapStyle === 'default' ? 'road_map' : mapConfig.mapStyle;
+      baseMapOpts = tmsServices.find((s) => s.id === mapStyle);
+      if (!baseMapOpts) {
+        this.onWarn(`mapStyle ${JSON.stringify(mapStyle)} was not found`);
+      } else {
+        limitMinZ = baseMapOpts.minZoom;
+        limitMaxZ = baseMapOpts.maxZoom;
+      }
     }
 
     const validate = (name, value, dflt, min, max) => {
@@ -37,8 +39,8 @@ export class VegaMapView extends VegaBaseView {
       return value;
     };
 
-    let minZoom = validate('minZoom', mapConfig.minZoom, limits.minZoom, limits.minZoom, limits.maxZoom);
-    let maxZoom = validate('maxZoom', mapConfig.maxZoom, limits.maxZoom, limits.minZoom, limits.maxZoom);
+    let minZoom = validate('minZoom', mapConfig.minZoom, limitMinZ, limitMinZ, limitMaxZ);
+    let maxZoom = validate('maxZoom', mapConfig.maxZoom, limitMaxZ, limitMinZ, limitMaxZ);
     if (minZoom > maxZoom) {
       this.onWarn('minZoom and maxZoom have been swapped');
       [minZoom, maxZoom] = [maxZoom, minZoom];
@@ -57,20 +59,20 @@ export class VegaMapView extends VegaBaseView {
       center: [mapConfig.latitude, mapConfig.longitude],
       zoom,
       zoomControl: mapConfig.zoomControl,
-      attributionControl: useDefaultMap,
+      attributionControl: !!baseMapOpts,
       // TODO: test and enable
       // maxBounds
     });
 
-    if (useDefaultMap) {
+    if (baseMapOpts) {
       map.attributionControl.setPrefix('');
 
       baseLayer = L
-        .tileLayer(url, {
-          minZoom: limits.minZoom,
-          maxZoom: limits.maxZoom,
-          subdomains: limits.subdomains || [],
-          attribution: limits.attribution
+        .tileLayer(baseMapOpts.url, {
+          minZoom: baseMapOpts.minZoom,
+          maxZoom: baseMapOpts.maxZoom,
+          subdomains: baseMapOpts.subdomains || [],
+          attribution: baseMapOpts.attribution
         })
         .addTo(map);
     }
