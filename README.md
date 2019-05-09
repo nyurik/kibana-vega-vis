@@ -1,5 +1,7 @@
 # Vega visualization plugin for Kibana
 
+**ATTENTION:** This code is mostly unmaintained because Vega plugin is now integrated into core Kibana and has more recent functionality.
+
 > Build [Vega](https://vega.github.io/vega/examples/) and [Vega-Lite](https://vega.github.io/vega-lite/examples/) data visualizations into Kibana, either standalone, or on top of a map.
 
 _Kibana 6.2 includes this plugin without the leaflet (`type=map`) support._
